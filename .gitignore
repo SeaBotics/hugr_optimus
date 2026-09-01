@@ -1,3 +1,45 @@
+# Colcon build artifacts
+/build/
+/install/
+/log/
+
+# Python compiled files and virtual environments
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.venv/
+venv/
+env/
+*.egg-info/
+
+# C++ compiled objects and shared libraries
+*.o
+*.so
+*.a
+*.swp
+*.swo
+
+# IDEs and Editors
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+.idea/
+*.user
+
+# Operating System generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+Thumbs.db
+ehthumbs.db
+
+# Temporary or local notes
+*.local
+
 # ROS 2-generated files
 **/install/
 **/log/
