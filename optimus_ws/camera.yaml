@@ -1,0 +1,32 @@
+/**:
+  ros__parameters:
+    pipeline_gen:
+      i_pipeline_type: RGBD
+      i_nn_type: none
+      i_enable_imu: false
+      i_enable_rgbd: false
+
+    rgb:
+      i_publish_topic: true
+      i_low_bandwidth: true
+      i_publish_compressed: true
+      i_fps: 30.0
+      i_width: 640
+      i_height: 640
+
+    stereo:
+      i_publish_topic: true
+      i_output_disparity: false
+      i_use_neural_depth: false
+      i_low_bandwidth: true
+      i_publish_compressed: true
+      i_fps: 30.0
+      i_width: 640
+      i_height: 640
+
+    left:
+      i_publish_topic: false
+
+    right:
+      i_publish_topic: false
+
