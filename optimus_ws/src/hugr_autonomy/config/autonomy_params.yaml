@@ -1,0 +1,20 @@
+/**:
+  ros__parameters:
+    # Guidance Parameters (Line-of-Sight - Fossen Chapter 10)
+    guidance:
+      lookahead_distance: 3.5      # Delta in meters (LOS lookahead)
+      acceptance_radius: 1.5       # Radius in meters to consider waypoint reached (Task 7 arrival tolerance)
+      cruise_speed: 1.2            # Nominal cruising speed (m/s)
+
+    # Heading Autopilot (PID Controller on Heading Error)
+    heading_controller:
+      kp: 1.8                      # Proportional gain
+      ki: 0.05                     # Integral gain
+      kd: 0.6                      # Derivative gain
+      max_yaw_rate: 1.2            # Maximum commanded yaw rate (rad/s)
+      integral_limit: 0.5          # Anti-windup limit
+
+    # Geodetic Reference Origin (Grimstad / Norway, matches simulator)
+    gnss:
+      origin_latitude: 58.334000   # Degrees Latitude
+      origin_longitude: 8.578000   # Degrees Longitude

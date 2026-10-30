@@ -1,0 +1,56 @@
+# ==============================================================
+# HUGR OPTIMUS - ROS 2 <-> GAZEBO HARMONIC BRIDGE CONFIGURATION
+# ==============================================================
+
+# 1. SIMULATION CLOCK (Gazebo -> ROS 2)
+- ros_topic_name: "/clock"
+  gz_topic_name: "/world/circuit_world/clock"
+  ros_type_name: "rosgraph_msgs/msg/Clock"
+  gz_type_name: "gz.msgs.Clock"
+  direction: GZ_TO_ROS
+
+# 2. FORWARD CAMERA STREAM (Gazebo -> ROS 2)
+- ros_topic_name: "/camera/image_raw"
+  gz_topic_name: "/camera/image_raw"
+  ros_type_name: "sensor_msgs/msg/Image"
+  gz_type_name: "gz.msgs.Image"
+  direction: GZ_TO_ROS
+
+# 3. IMU SENSOR (Gazebo -> ROS 2)
+- ros_topic_name: "/imu/data"
+  gz_topic_name: "/imu/data"
+  ros_type_name: "sensor_msgs/msg/Imu"
+  gz_type_name: "gz.msgs.IMU"
+  direction: GZ_TO_ROS
+
+# 4. GPS NAVSAT (Gazebo -> ROS 2)
+- ros_topic_name: "/fix"
+  gz_topic_name: "/fix"
+  ros_type_name: "sensor_msgs/msg/NavSatFix"
+  gz_type_name: "gz.msgs.NavSat"
+  direction: GZ_TO_ROS
+
+# 5. THRUSTERS (ROS 2 -> Gazebo)
+- ros_topic_name: "/hugr/thrusters/m1/cmd_thrust"
+  gz_topic_name: "/hugr/thrusters/m1/cmd_thrust"
+  ros_type_name: "std_msgs/msg/Float64"
+  gz_type_name: "gz.msgs.Double"
+  direction: ROS_TO_GZ
+
+- ros_topic_name: "/hugr/thrusters/m2/cmd_thrust"
+  gz_topic_name: "/hugr/thrusters/m2/cmd_thrust"
+  ros_type_name: "std_msgs/msg/Float64"
+  gz_type_name: "gz.msgs.Double"
+  direction: ROS_TO_GZ
+
+- ros_topic_name: "/hugr/thrusters/m3/cmd_thrust"
+  gz_topic_name: "/hugr/thrusters/m3/cmd_thrust"
+  ros_type_name: "std_msgs/msg/Float64"
+  gz_type_name: "gz.msgs.Double"
+  direction: ROS_TO_GZ
+
+- ros_topic_name: "/hugr/thrusters/m4/cmd_thrust"
+  gz_topic_name: "/hugr/thrusters/m4/cmd_thrust"
+  ros_type_name: "std_msgs/msg/Float64"
+  gz_type_name: "gz.msgs.Double"
+  direction: ROS_TO_GZ

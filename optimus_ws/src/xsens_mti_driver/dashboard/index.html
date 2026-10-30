@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>SeaBotics Hugr Optimus - Live Vessel Dashboard</title>
+  <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
+  <style>
+    @keyframes pulse-slow {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+    .pulse-indicator { animation: pulse-slow 2s infinite ease-in-out; }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen font-sans antialiased p-4 select-none">
+
+  <!-- Top Header Bar -->
+  <header class="bg-slate-900/80 backdrop-blur border border-slate-800 rounded-2xl p-4 mb-4 shadow-xl flex flex-wrap items-center justify-between gap-4">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400 font-bold text-xl shadow-inner">
+        ⚓
+      </div>
+      <div>
+        <div class="flex items-center gap-2">
+          <h1 class="text-xl font-bold tracking-tight text-white">SeaBotics Hugr Optimus</h1>
+          <span class="px-2 py-0.5 text-xs font-semibold rounded-full bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">ASV-01</span>
+        </div>
+        <p class="text-xs text-slate-400">Autonomous Surface Vessel • University of Agder (UiA)</p>
+      </div>
+    </div>
+
+    <!-- Telemetry Status Pills -->
+    <div class="flex items-center gap-3 flex-wrap">
+      <!-- GPS Status -->
+      <div class="flex items-center gap-2 bg-slate-950/60 border border-slate-800 px-3 py-1.5 rounded-xl">
+        <span id="gps-dot" class="w-2.5 h-2.5 rounded-full bg-emerald-500 pulse-indicator shadow-[0_0_8px_rgba(16,185,129,0.6)]"></span>
+        <div class="text-left">
+          <div class="text-[10px] uppercase font-bold tracking-wider text-slate-500 leading-none">GNSS Status</div>
+          <div id="gps-mode" class="text-xs font-semibold text-emerald-400">RTK Fixed (±2 cm)</div>
+        </div>
+      </div>
+
+      <!-- Heading Pill -->
+      <div class="bg-slate-950/60 border border-slate-800 px-3 py-1.5 rounded-xl text-left">
+        <div class="text-[10px] uppercase font-bold tracking-wider text-slate-500 leading-none">Heading</div>
+        <div id="header-heading" class="text-xs font-mono font-bold text-cyan-400">045.2° NE</div>
+      </div>
+
+      <!-- Mode & Signal Tower Indicator -->
+      <div class="flex items-center gap-3 bg-slate-950/60 border border-slate-800 px-3 py-1.5 rounded-xl">
+        <div class="flex gap-1.5 items-center">
+          <span id="tower-r" class="w-3.5 h-3.5 rounded-full bg-red-950 border border-red-800/40"></span>
+          <span id="tower-y" class="w-3.5 h-3.5 rounded-full bg-yellow-950 border border-yellow-800/40"></span>
+          <span id="tower-g" class="w-3.5 h-3.5 rounded-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.8)] border border-emerald-400"></span>
+        </div>
+        <div class="text-left">
+          <div class="text-[10px] uppercase font-bold tracking-wider text-slate-500 leading-none">Signal Tower</div>
+          <div id="op-mode-text" class="text-xs font-bold text-emerald-400">AUTONOMOUS</div>
+        </div>
+      </div>
+
+      <!-- Mode Selector Controls -->
+      <div class="flex gap-1 bg-slate-950/80 p-1 rounded-xl border border-slate-800">
+        <button onclick="setMode('r')" class="px-2.5 py-1 text-xs font-bold rounded-lg transition text-slate-400 hover:text-red-400 hover:bg-red-500/10">Stop</button>
+        <button onclick="setMode('y')" class="px-2.5 py-1 text-xs font-bold rounded-lg transition text-slate-400 hover:text-yellow-400 hover:bg-yellow-500/10">Manual</button>
+        <button onclick="setMode('g')" class="px-2.5 py-1 text-xs font-bold rounded-lg transition bg-emerald-500 text-slate-950 shadow-md">Auto</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Grid Layout -->
+  <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
+
+    <!-- LEFT / CENTER: Nautical Map Chart (8 Cols) -->
+    <div class="lg:col-span-8 bg-slate-900/60 border border-slate-800 rounded-2xl p-4 flex flex-col shadow-xl">
+      <div class="flex items-center justify-between mb-3">
+        <div class="flex items-center gap-2">
+          <span class="text-sm font-bold text-slate-200">📍 Live Nautical Chart</span>
+          <span class="text-xs text-slate-500 font-mono" id="chart-coords">58.342150° N, 8.591240° E</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <button onclick="resetTrail()" class="px-2 py-1 text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg transition">Clear Trail</button>
+          <button onclick="toggleSimulation()" id="sim-btn" class="px-2.5 py-1 text-xs font-semibold bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 rounded-lg hover:bg-cyan-500/30 transition">
+            Simulation: Active
+          </button>
+        </div>
+      </div>
+
+      <!-- Canvas Plotter Container -->
+      <div class="relative w-full h-[460px] bg-slate-950 rounded-xl overflow-hidden border border-slate-800/80 shadow-inner">
+        <canvas id="navCanvas" class="w-full h-full block cursor-crosshair"></canvas>
+
+        <!-- Overlay Coordinate Badge -->
+        <div class="absolute bottom-3 left-3 bg-slate-900/90 backdrop-blur border border-slate-800 rounded-lg px-3 py-2 text-xs font-mono shadow-lg flex flex-col gap-0.5">
+          <div class="text-slate-400 text-[10px] uppercase font-bold tracking-wider">Target Waypoint</div>
+          <div id="wp-info" class="text-cyan-400 font-semibold">WP-2: Dist 28.4m • Brg 042°</div>
+          <div class="text-[10px] text-slate-500">Click anywhere on chart to add Waypoint</div>
+        </div>
+
+        <!-- Scale indicator -->
+        <div class="absolute bottom-3 right-3 bg-slate-900/90 backdrop-blur border border-slate-800 rounded-lg px-2.5 py-1 text-[11px] font-mono text-slate-400">
+          Scale: 50m grid
+        </div>
+      </div>
+
+      <!-- Coordinates & Mission Waypoints Bar -->
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-3">
+        <div class="bg-slate-950/50 p-2.5 rounded-xl border border-slate-800/80">
+          <div class="text-[10px] uppercase font-bold tracking-wider text-slate-500">Latitude</div>
+          <div id="disp-lat" class="text-sm font-mono font-bold text-slate-200">58.342150° N</div>
+        </div>
+        <div class="bg-slate-950/50 p-2.5 rounded-xl border border-slate-800/80">
+          <div class="text-[10px] uppercase font-bold tracking-wider text-slate-500">Longitude</div>
+          <div id="disp-lon" class="text-sm font-mono font-bold text-slate-200">8.591240° E</div>
+        </div>
+        <div class="bg-slate-950/50 p-2.5 rounded-xl border border-slate-800/80">
+          <div class="text-[10px] uppercase font-bold tracking-wider text-slate-500">Altitude</div>
+          <div id="disp-alt" class="text-sm font-mono font-bold text-slate-200">1.82 m (MSL)</div>
+        </div>
+        <div class="bg-slate-950/50 p-2.5 rounded-xl border border-slate-800/80">
+          <div class="text-[10px] uppercase font-bold tracking-wider text-slate-500">Speed (SOG)</div>
+          <div id="disp-sog" class="text-sm font-mono font-bold text-emerald-400">1.85 m/s (3.6 kts)</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: Instrument Panel (4 Cols) -->
+    <div class="lg:col-span-4 flex flex-col gap-4">
+
+      <!-- Compass Rose & Heading Dial -->
+      <div class="bg-slate-900/60 border border-slate-800 rounded-2xl p-4 shadow-xl flex flex-col items-center">
+        <div class="w-full flex items-center justify-between mb-2">
+          <span class="text-sm font-bold text-slate-200">🧭 3D Heading & Yaw</span>
+          <span id="heading-deg-badge" class="px-2 py-0.5 text-xs font-mono font-bold bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 rounded-md">045°</span>
+        </div>
+
+        <div class="relative w-48 h-48 my-1 flex items-center justify-center">
+          <!-- Compass Outer Ring -->
+          <svg id="compassRing" class="w-full h-full transition-transform duration-100 ease-out" viewBox="0 0 200 200">
+            <circle cx="100" cy="100" r="90" fill="#090d16" stroke="#1e293b" stroke-width="2" />
+            <circle cx="100" cy="100" r="82" fill="none" stroke="#334155" stroke-dasharray="2 6" stroke-width="1.5" />
+            <!-- Cardinal directions -->
+            <text x="100" y="28" fill="#ef4444" font-weight="bold" font-size="14" text-anchor="middle">N</text>
+            <text x="175" y="105" fill="#94a3b8" font-weight="bold" font-size="12" text-anchor="middle">E</text>
+            <text x="100" y="182" fill="#94a3b8" font-weight="bold" font-size="12" text-anchor="middle">S</text>
+            <text x="25" y="105" fill="#94a3b8" font-weight="bold" font-size="12" text-anchor="middle">W</text>
+            <!-- Ticks -->
+            <line x1="100" y1="32" x2="100" y2="40" stroke="#ef4444" stroke-width="2" />
+            <line x1="168" y1="100" x2="160" y2="100" stroke="#64748b" stroke-width="1.5" />
+            <line x1="100" y1="168" x2="100" y2="160" stroke="#64748b" stroke-width="1.5" />
+            <line x1="32" y1="100" x2="40" y2="100" stroke="#64748b" stroke-width="1.5" />
+          </svg>
+
+          <!-- Fixed Boat Proa Indicator -->
+          <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+            <!-- Boat needle pointing up -->
+            <svg class="w-16 h-16 text-cyan-400 drop-shadow-[0_0_8px_rgba(34,211,238,0.5)]" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 2L4.5 20.29l.71.71L12 18l6.79 3 .71-.71z" />
+            </svg>
+          </div>
+        </div>
+
+        <div class="w-full grid grid-cols-2 gap-2 text-center text-xs font-mono mt-1">
+          <div class="bg-slate-950 p-2 rounded-lg border border-slate-800/80">
+            <span class="text-slate-500 text-[10px] block">RATE OF TURN</span>
+            <span id="rot-val" class="font-bold text-slate-200">+1.2 °/s</span>
+          </div>
+          <div class="bg-slate-950 p-2 rounded-lg border border-slate-800/80">
+            <span class="text-slate-500 text-[10px] block">RUDDER / DRIFT</span>
+            <span id="drift-val" class="font-bold text-cyan-400">-2.4° Port</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Attitude / Artificial Horizon (Roll & Pitch) -->
+      <div class="bg-slate-900/60 border border-slate-800 rounded-2xl p-4 shadow-xl">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-sm font-bold text-slate-200">🌊 Wave Dynamics (IMU)</span>
+          <span class="text-xs font-mono text-slate-400">100 Hz</span>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <!-- Roll Gauge -->
+          <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 text-center flex flex-col items-center">
+            <span class="text-[10px] font-bold uppercase tracking-wider text-slate-500">Roll (Balanceo)</span>
+            <div class="relative w-20 h-20 my-1 flex items-center justify-center">
+              <div id="rollHorizon" class="w-16 h-16 rounded-full border-2 border-slate-700 bg-gradient-to-b from-sky-900/40 via-transparent to-amber-950/40 relative overflow-hidden transition-transform duration-75">
+                <div class="absolute inset-x-0 top-1/2 h-0.5 bg-emerald-400 shadow-[0_0_6px_rgba(52,211,153,0.8)]"></div>
+              </div>
+              <div class="absolute w-2 h-2 rounded-full bg-cyan-400 pointer-events-none"></div>
+            </div>
+            <span id="roll-val" class="text-xs font-mono font-bold text-slate-200">+2.1° Estribor</span>
+          </div>
+
+          <!-- Pitch Gauge -->
+          <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 text-center flex flex-col items-center">
+            <span class="text-[10px] font-bold uppercase tracking-wider text-slate-500">Pitch (Cabeceo)</span>
+            <div class="relative w-20 h-20 my-1 flex items-center justify-center">
+              <div class="w-16 h-16 rounded-full border-2 border-slate-700 bg-slate-900 relative overflow-hidden flex items-center justify-center">
+                <div id="pitchLine" class="w-12 h-1 bg-cyan-400 rounded-full transition-transform duration-75"></div>
+              </div>
+              <div class="absolute inset-y-2 left-1/2 w-0.5 bg-slate-800 pointer-events-none"></div>
+            </div>
+            <span id="pitch-val" class="text-xs font-mono font-bold text-slate-200">-1.4° Proa baja</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Thrusters & Propulsion Status -->
+      <div class="bg-slate-900/60 border border-slate-800 rounded-2xl p-4 shadow-xl">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-sm font-bold text-slate-200">⚡ 4x Thrusters PWM</span>
+          <span class="text-xs font-mono text-slate-500">1100 - 1900 μs</span>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2 text-xs font-mono">
+          <div class="bg-slate-950 p-2 rounded-lg border border-slate-800 flex justify-between items-center">
+            <span class="text-slate-400">T1 (Port Fwd):</span>
+            <span id="pwm-1" class="text-emerald-400 font-bold">1620 μs</span>
+          </div>
+          <div class="bg-slate-950 p-2 rounded-lg border border-slate-800 flex justify-between items-center">
+            <span class="text-slate-400">T2 (Stbd Fwd):</span>
+            <span id="pwm-2" class="text-emerald-400 font-bold">1620 μs</span>
+          </div>
+          <div class="bg-slate-950 p-2 rounded-lg border border-slate-800 flex justify-between items-center">
+            <span class="text-slate-400">T3 (Port Aft):</span>
+            <span id="pwm-3" class="text-emerald-400 font-bold">1500 μs</span>
+          </div>
+          <div class="bg-slate-950 p-2 rounded-lg border border-slate-800 flex justify-between items-center">
+            <span class="text-slate-400">T4 (Stbd Aft):</span>
+            <span id="pwm-4" class="text-emerald-400 font-bold">1500 μs</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Interactive JavaScript -->
+  <script>
+    // State variables
+    let boat = {
+      x: 0, // canvas relative coordinates
+      y: 0,
+      lat: 58.342150,
+      lon: 8.591240,
+      alt: 1.85,
+      heading: 45.0, // degrees
+      speed: 1.85, // m/s
+      rot: 0.8, // deg/s
+      roll: 0.0,
+      pitch: 0.0,
+      mode: 'g' // 'r', 'y', 'g'
+    };
+
+    let waypoints = [
+      { x: 120, y: -140, label: 'WP-1 (Gate)' },
+      { x: 180, y: -60, label: 'WP-2 (Yellow Buoy)' },
+      { x: 80, y: 110, label: 'WP-3 (Finish)' }
+    ];
+
+    let trail = [];
+    let isSimulating = true;
+    let animTime = 0;
+
+    // Canvas setup
+    const canvas = document.getElementById('navCanvas');
+    const ctx = canvas.getContext('2d');
+
+    function resizeCanvas() {
+      const rect = canvas.getBoundingClientRect();
+      canvas.width = rect.width;
+      canvas.height = rect.height;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    // Chart Click to add waypoints
+    canvas.addEventListener('click', (e) => {
+      const rect = canvas.getBoundingClientRect();
+      const clickX = e.clientX - rect.left - canvas.width / 2;
+      const clickY = e.clientY - rect.top - canvas.height / 2;
+      waypoints.push({ x: clickX, y: clickY, label: `WP-${waypoints.length + 1}` });
+    });
+
+    function toggleSimulation() {
+      isSimulating = !isSimulating;
+      document.getElementById('sim-btn').innerText = isSimulating ? 'Simulation: Active' : 'Simulation: Paused';
+      document.getElementById('sim-btn').className = isSimulating 
+        ? 'px-2.5 py-1 text-xs font-semibold bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 rounded-lg hover:bg-cyan-500/30 transition'
+        : 'px-2.5 py-1 text-xs font-semibold bg-slate-800 text-slate-400 border border-slate-700 rounded-lg hover:bg-slate-700 transition';
+    }
+
+    function resetTrail() {
+      trail = [];
+    }
+
+    function setMode(mode) {
+      boat.mode = mode;
+      const r = document.getElementById('tower-r');
+      const y = document.getElementById('tower-y');
+      const g = document.getElementById('tower-g');
+      const text = document.getElementById('op-mode-text');
+
+      r.className = 'w-3.5 h-3.5 rounded-full bg-red-950 border border-red-800/40';
+      y.className = 'w-3.5 h-3.5 rounded-full bg-yellow-950 border border-yellow-800/40';
+      g.className = 'w-3.5 h-3.5 rounded-full bg-emerald-950 border border-emerald-800/40';
+
+      if (mode === 'r') {
+        r.className = 'w-3.5 h-3.5 rounded-full bg-red-500 shadow-[0_0_10px_rgba(239,68,68,0.8)] border border-red-400';
+        text.innerText = 'SAFE STOP';
+        text.className = 'text-xs font-bold text-red-400';
+        boat.speed = 0;
+      } else if (mode === 'y') {
+        y.className = 'w-3.5 h-3.5 rounded-full bg-yellow-400 shadow-[0_0_10px_rgba(250,204,21,0.8)] border border-yellow-300';
+        text.innerText = 'MANUAL';
+        text.className = 'text-xs font-bold text-yellow-400';
+        boat.speed = 1.2;
+      } else {
+        g.className = 'w-3.5 h-3.5 rounded-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.8)] border border-emerald-400';
+        text.innerText = 'AUTONOMOUS';
+        text.className = 'text-xs font-bold text-emerald-400';
+        boat.speed = 1.85;
+      }
+    }
+
+    // Main render & update loop
+    function update(dt) {
+      if (isSimulating && boat.mode !== 'r') {
+        animTime += dt;
+        // Turn gently towards next waypoint
+        const target = waypoints[0] || { x: 0, y: 0 };
+        const dx = target.x - boat.x;
+        const dy = target.y - boat.y;
+        const targetHeading = (Math.atan2(dx, -dy) * 180 / Math.PI + 360) % 360;
+
+        let diff = (targetHeading - boat.heading + 540) % 360 - 180;
+        boat.rot = diff * 0.05;
+        boat.heading = (boat.heading + boat.rot + 360) % 360;
+
+        // Move boat forward
+        const rad = (boat.heading * Math.PI) / 180;
+        const distStep = boat.speed * dt * 25; // canvas scaling
+        boat.x += Math.sin(rad) * distStep;
+        boat.y -= Math.cos(rad) * distStep;
+
+        // Waypoint check
+        if (Math.hypot(dx, dy) < 25 && waypoints.length > 1) {
+          waypoints.push(waypoints.shift()); // cycle waypoints
+        }
+
+        // Simulating wave motion
+        boat.roll = Math.sin(animTime * 2.5) * 4.2;
+        boat.pitch = Math.cos(animTime * 1.8) * 2.8;
+
+        // GPS coordinate drift
+        boat.lat = 58.342150 - (boat.y * 0.000008);
+        boat.lon = 8.591240 + (boat.x * 0.000015);
+
+        // Record trail
+        if (trail.length === 0 || Math.hypot(boat.x - trail[trail.length-1].x, boat.y - trail[trail.length-1].y) > 6) {
+          trail.push({ x: boat.x, y: boat.y });
+          if (trail.length > 300) trail.shift();
+        }
+      }
+
+      // Update DOM UI elements
+      document.getElementById('header-heading').innerText = `${boat.heading.toFixed(1)}° ${getCardinal(boat.heading)}`;
+      document.getElementById('heading-deg-badge').innerText = `${Math.round(boat.heading)}°`;
+      document.getElementById('compassRing').style.transform = `rotate(${-boat.heading}deg)`;
+      document.getElementById('disp-lat').innerText = `${boat.lat.toFixed(6)}° N`;
+      document.getElementById('disp-lon').innerText = `${boat.lon.toFixed(6)}° E`;
+      document.getElementById('chart-coords').innerText = `${boat.lat.toFixed(6)}° N, ${boat.lon.toFixed(6)}° E`;
+      document.getElementById('disp-sog').innerText = `${boat.speed.toFixed(2)} m/s (${(boat.speed * 1.94384).toFixed(1)} kts)`;
+      document.getElementById('rot-val').innerText = `${boat.rot > 0 ? '+' : ''}${boat.rot.toFixed(1)} °/s`;
+      document.getElementById('drift-val').innerText = `${Math.abs(boat.roll).toFixed(1)}° ${boat.roll > 0 ? 'Stbd' : 'Port'}`;
+      document.getElementById('roll-val').innerText = `${boat.roll > 0 ? '+' : ''}${boat.roll.toFixed(1)}°`;
+      document.getElementById('pitch-val').innerText = `${boat.pitch > 0 ? '+' : ''}${boat.pitch.toFixed(1)}°`;
+
+      document.getElementById('rollHorizon').style.transform = `rotate(${-boat.roll}deg)`;
+      document.getElementById('pitchLine').style.transform = `translateY(${boat.pitch * 3}px)`;
+
+      // PWM throttle representation
+      const basePWM = boat.mode === 'r' ? 1500 : (boat.mode === 'y' ? 1580 : 1650);
+      const steer = Math.round(boat.rot * 15);
+      document.getElementById('pwm-1').innerText = `${basePWM - steer} μs`;
+      document.getElementById('pwm-2').innerText = `${basePWM + steer} μs`;
+    }
+
+    function getCardinal(deg) {
+      const cardinals = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
+      return cardinals[Math.round(deg / 45) % 8];
+    }
+
+    // Render Canvas
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      const cx = canvas.width / 2;
+      const cy = canvas.height / 2;
+
+      ctx.save();
+      // Translate to keep boat centered
+      ctx.translate(cx - boat.x, cy - boat.y);
+
+      // 1. Draw Grid
+      ctx.strokeStyle = '#1e293b';
+      ctx.lineWidth = 1;
+      const gridSize = 60;
+      const startX = Math.floor((boat.x - cx) / gridSize) * gridSize;
+      const endX = Math.ceil((boat.x + cx) / gridSize) * gridSize;
+      const startY = Math.floor((boat.y - cy) / gridSize) * gridSize;
+      const endY = Math.ceil((boat.y + cy) / gridSize) * gridSize;
+
+      ctx.beginPath();
+      for (let x = startX; x <= endX; x += gridSize) {
+        ctx.moveTo(x, startY);
+        ctx.lineTo(x, endY);
+      }
+      for (let y = startY; y <= endY; y += gridSize) {
+        ctx.moveTo(startX, y);
+        ctx.lineTo(endX, y);
+      }
+      ctx.stroke();
+
+      // 2. Draw Trail
+      if (trail.length > 1) {
+        ctx.beginPath();
+        ctx.strokeStyle = '#06b6d4';
+        ctx.lineWidth = 2.5;
+        ctx.lineJoin = 'round';
+        ctx.moveTo(trail[0].x, trail[0].y);
+        for (let i = 1; i < trail.length; i++) {
+          ctx.lineTo(trail[i].x, trail[i].y);
+        }
+        ctx.stroke();
+      }
+
+      // 3. Draw Planned Path between waypoints
+      if (waypoints.length > 0) {
+        ctx.beginPath();
+        ctx.strokeStyle = 'rgba(250, 204, 21, 0.4)';
+        ctx.setLineDash([6, 6]);
+        ctx.lineWidth = 2;
+        ctx.moveTo(boat.x, boat.y);
+        waypoints.forEach(wp => ctx.lineTo(wp.x, wp.y));
+        ctx.stroke();
+        ctx.setLineDash([]);
+      }
+
+      // 4. Draw Waypoints & Buoys
+      waypoints.forEach((wp, idx) => {
+        ctx.save();
+        ctx.translate(wp.x, wp.y);
+
+        // Buoy circle glow
+        ctx.beginPath();
+        ctx.arc(0, 0, 10, 0, Math.PI * 2);
+        ctx.fillStyle = idx === 0 ? '#10b981' : (idx === 1 ? '#f59e0b' : '#ef4444');
+        ctx.shadowColor = ctx.fillStyle;
+        ctx.shadowBlur = 10;
+        ctx.fill();
+
+        // Label
+        ctx.shadowBlur = 0;
+        ctx.fillStyle = '#f8fafc';
+        ctx.font = '10px monospace';
+        ctx.fillText(wp.label, 14, 4);
+        ctx.restore();
+      });
+
+      // 5. Draw Boat Icon
+      ctx.save();
+      ctx.translate(boat.x, boat.y);
+      ctx.rotate((boat.heading * Math.PI) / 180);
+
+      // Radar sweep cone
+      const grad = ctx.createRadialGradient(0, 0, 10, 0, 0, 80);
+      grad.addColorStop(0, 'rgba(34, 211, 238, 0.35)');
+      grad.addColorStop(1, 'rgba(34, 211, 238, 0)');
+      ctx.beginPath();
+      ctx.moveTo(0, 0);
+      ctx.arc(0, 0, 80, -Math.PI / 2 - 0.3, -Math.PI / 2 + 0.3);
+      ctx.closePath();
+      ctx.fillStyle = grad;
+      ctx.fill();
+
+      // Boat hull silhouette
+      ctx.beginPath();
+      ctx.moveTo(0, -22); // Proa
+      ctx.lineTo(11, 8);
+      ctx.lineTo(8, 20); // Popa estribor
+      ctx.lineTo(-8, 20); // Popa babor
+      ctx.lineTo(-11, 8);
+      ctx.closePath();
+      ctx.fillStyle = '#06b6d4';
+      ctx.shadowColor = 'rgba(6, 182, 212, 0.8)';
+      ctx.shadowBlur = 12;
+      ctx.fill();
+      ctx.strokeStyle = '#e2e8f0';
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+
+      // Center point
+      ctx.beginPath();
+      ctx.arc(0, 0, 3, 0, Math.PI * 2);
+      ctx.fillStyle = '#ffffff';
+      ctx.fill();
+
+      ctx.restore(); // boat
+      ctx.restore(); // chart translate
+    }
+
+    let lastTime = performance.now();
+    function loop(now) {
+      const dt = (now - lastTime) / 1000;
+      lastTime = now;
+      update(dt);
+      draw();
+      requestAnimationFrame(loop);
+    }
+    requestAnimationFrame(loop);
+  </script>
+</body>
+</html>

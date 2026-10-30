@@ -3,5 +3,12 @@
 **/log/
 **/build/
 
+# Python cache
+**/__pycache__/
+*.pyc
+
+# Large raw CAD exports not used in runtime
+**/frame_full.stl
+
 # VS Code settings
 /.vscode/
