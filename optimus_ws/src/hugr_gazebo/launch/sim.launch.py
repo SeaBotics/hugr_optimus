@@ -54,9 +54,17 @@ def generate_launch_description():
         output='screen'
     )
 
+    # 6. Launch Gazebo Thruster Bridge (/motor_pwms and /cmd_vel -> Gazebo thrusters)
+    thruster_bridge = Node(
+        package='hugr_gazebo',
+        executable='thruster_bridge.py',
+        output='screen'
+    )
+
     return LaunchDescription([
         headless_arg,
         set_gz_resource_path,
         gz_sim,
-        bridge
+        bridge,
+        thruster_bridge
     ])

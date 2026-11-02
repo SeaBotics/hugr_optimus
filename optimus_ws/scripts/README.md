@@ -7,6 +7,7 @@ This folder contains helper scripts to run simulations, teleoperation, testing, 
 | Script (Linux) | Script (Windows) | Description |
 | :--- | :--- | :--- |
 | `run_gazebo.sh` | `run_gazebo.bat` | **Gazebo Sim (Harmonic)** 3D maritime world with water buoyancy, competition buoys, sensors (Camera, IMU, GPS), BlueRobotics T200 thrusters, and ROS 2 parameter bridge. |
+| `reload_boat.sh` | `reload_boat.bat` | **Instant Hot-Reload**: Deletes and respawns the boat with latest `model.sdf` parameters in 1s without restarting Gazebo. |
 | `run_simulation.sh` | `run_simulation.bat` | **Fossen SITL Simulator** fast 2D non-linear 3-DOF maneuvering simulation visualized in RViz2. |
 
 ## 🕹️ Control & Teleoperation
