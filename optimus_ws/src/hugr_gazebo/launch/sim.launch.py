@@ -9,7 +9,6 @@ from launch_ros.actions import Node
 def generate_launch_description():
     # 1. Package directories
     pkg_hugr_gazebo = get_package_share_directory('hugr_gazebo')
-    pkg_hugr_description = get_package_share_directory('hugr_description')
     pkg_ros_gz_sim = get_package_share_directory('ros_gz_sim')
 
     # 2. Config paths
@@ -18,9 +17,16 @@ def generate_launch_description():
     # 3. Environment paths (Gazebo will look directly in these folders)
     models_dir = os.path.join(pkg_hugr_gazebo, 'models')
     worlds_dir = os.path.join(pkg_hugr_gazebo, 'worlds')
-    description_parent = os.path.dirname(pkg_hugr_description)
 
-    gz_resource_paths = f"{worlds_dir}:{models_dir}:{description_parent}:{pkg_hugr_description}"
+    # Self-contained: hugr_gazebo includes its own models and meshes.
+    # Optionally append hugr_description if installed in the workspace.
+    gz_resource_paths = f"{worlds_dir}:{models_dir}"
+    try:
+        pkg_hugr_description = get_package_share_directory('hugr_description')
+        description_parent = os.path.dirname(pkg_hugr_description)
+        gz_resource_paths += f":{description_parent}:{pkg_hugr_description}"
+    except Exception:
+        pass
 
     set_gz_resource_path = SetEnvironmentVariable(
         name='GZ_SIM_RESOURCE_PATH',

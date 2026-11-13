@@ -66,7 +66,7 @@
         </geometry>
       </collision>
 
-      <!-- Port Bow Tapered Wedge (Afilado de proa babor) -->
+      <!-- Port Bow Tapered Wedge  -->
       <collision name="port_bow_collision">
         <pose>0.19 0.222 -0.240 0 0.20 0</pose>
         <geometry>
@@ -82,7 +82,7 @@
         </geometry>
       </collision>
 
-      <!-- Starboard Bow Tapered Wedge (Afilado de proa estribor) -->
+      <!-- Starboard Bow Tapered Wedge  -->
       <collision name="starboard_bow_collision">
         <pose>0.19 -0.222 -0.240 0 0.20 0</pose>
         <geometry>
@@ -90,7 +90,7 @@
         </geometry>
       </collision>
 
-      <!-- Front Crossbar / Beam (Viga transversal delantera) -->
+      <!-- Front Crossbar / Beam  -->
       <collision name="front_crossbeam_collision">
         <pose>0.12 0.0 -0.12 0 0 0</pose>
         <geometry>
@@ -98,7 +98,7 @@
         </geometry>
       </collision>
 
-      <!-- Rear Crossbar / Beam (Viga transversal trasera) -->
+      <!-- Rear Crossbar / Beam  -->
       <collision name="rear_crossbeam_collision">
         <pose>-0.32 0.0 -0.12 0 0 0</pose>
         <geometry>
@@ -106,7 +106,7 @@
         </geometry>
       </collision>
 
-      <!-- Central Electronics Enclosure (Caja estanca central) -->
+      <!-- Central Electronics Enclosure  -->
       <collision name="electronics_box_collision">
         <pose>-0.10 0.0 -0.06 0 0 0</pose>
         <geometry>
@@ -114,7 +114,7 @@
         </geometry>
       </collision>
 
-      <!-- Bow Center Sonar / Sensor Structure (Estructura proa central) -->
+      <!-- Bow Center Sonar / Sensor Structure  -->
       <collision name="bow_center_collision">
         <pose>0.34 0.0 -0.24 0 0 0</pose>
         <geometry>
@@ -122,7 +122,7 @@
         </geometry>
       </collision>
 
-      <!-- Stern Center Thruster Bracket (Soporte popa motor túnel M4) -->
+      <!-- Stern Center Thruster Bracket  -->
       <collision name="stern_center_collision">
         <pose>-0.41 0.0 -0.28 0 0 0</pose>
         <geometry>
@@ -137,10 +137,11 @@
       <sensor name="front_camera" type="camera">
         <pose>0.4076 0.0 0.18 0 0.08 0</pose>
         <always_on>1</always_on>
-        <update_rate>30</update_rate>
+        <update_rate>20</update_rate>
         <visualize>true</visualize>
-        <topic>/camera/image_raw</topic>
+        <topic>/oak/rgb/image_raw</topic>
         <camera>
+          <camera_info_topic>/oak/rgb/camera_info</camera_info_topic>
           <horizontal_fov>1.39626</horizontal_fov>
           <image>
             <width>1280</width>
@@ -154,6 +155,28 @@
         </camera>
       </sensor>
 
+      <!-- Front Stereo Depth Camera (Luxonis OAK-D Depth) -->
+      <sensor name="front_depth_camera" type="depth_camera">
+        <pose>0.4076 0.0 0.18 0 0.08 0</pose>
+        <always_on>1</always_on>
+        <update_rate>15</update_rate>
+        <visualize>false</visualize>
+        <topic>/oak/stereo/image_raw</topic>
+        <camera>
+          <camera_info_topic>/oak/stereo/camera_info</camera_info_topic>
+          <horizontal_fov>1.39626</horizontal_fov>
+          <image>
+            <width>1280</width>
+            <height>720</height>
+            <format>R_FLOAT32</format>
+          </image>
+          <clip>
+            <near>0.2</near>
+            <far>50.0</far>
+          </clip>
+        </camera>
+      </sensor>
+
       <!-- IMU Sensor (Xsens MTi on vessel center) -->
       <sensor name="imu_sensor" type="imu">
         <pose>0.0 0.0 -0.0184 0 0 0</pose>
@@ -162,12 +185,12 @@
         <topic>/imu/data</topic>
       </sensor>
 
-      <!-- GPS / NavSat Sensor -->
+      <!-- GPS / NavSat Sensor (Xsens MTi-680G RTK GNSS) -->
       <sensor name="navsat_sensor" type="navsat">
         <pose>0.0 0.0 0.15 0 0 0</pose>
         <always_on>1</always_on>
         <update_rate>10</update_rate>
-        <topic>/fix</topic>
+        <topic>/gnss</topic>
       </sensor>
     </link>
 

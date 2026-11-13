@@ -1,5 +1,6 @@
 # ==============================================================
 # HUGR OPTIMUS - ROS 2 <-> GAZEBO HARMONIC BRIDGE CONFIGURATION
+# Matches exact real vessel sensor topics (OAK-D, Xsens MTi-680G)
 # ==============================================================
 
 # 1. SIMULATION CLOCK (Gazebo -> ROS 2)
@@ -9,23 +10,42 @@
   gz_type_name: "gz.msgs.Clock"
   direction: GZ_TO_ROS
 
-# 2. FORWARD CAMERA STREAM (Gazebo -> ROS 2)
-- ros_topic_name: "/camera/image_raw"
-  gz_topic_name: "/camera/image_raw"
+# 2. FORWARD CAMERA STREAM (Luxonis OAK-D RGB & Info: Gazebo -> ROS 2)
+- ros_topic_name: "/oak/rgb/image_raw"
+  gz_topic_name: "/oak/rgb/image_raw"
   ros_type_name: "sensor_msgs/msg/Image"
   gz_type_name: "gz.msgs.Image"
   direction: GZ_TO_ROS
 
-# 3. IMU SENSOR (Gazebo -> ROS 2)
+- ros_topic_name: "/oak/rgb/camera_info"
+  gz_topic_name: "/oak/rgb/camera_info"
+  ros_type_name: "sensor_msgs/msg/CameraInfo"
+  gz_type_name: "gz.msgs.CameraInfo"
+  direction: GZ_TO_ROS
+
+# 2b. FORWARD STEREO DEPTH STREAM (Luxonis OAK-D Stereo Depth & Info: Gazebo -> ROS 2)
+- ros_topic_name: "/oak/stereo/image_raw"
+  gz_topic_name: "/oak/stereo/image_raw"
+  ros_type_name: "sensor_msgs/msg/Image"
+  gz_type_name: "gz.msgs.Image"
+  direction: GZ_TO_ROS
+
+- ros_topic_name: "/oak/stereo/camera_info"
+  gz_topic_name: "/oak/stereo/camera_info"
+  ros_type_name: "sensor_msgs/msg/CameraInfo"
+  gz_type_name: "gz.msgs.CameraInfo"
+  direction: GZ_TO_ROS
+
+# 3. IMU SENSOR (Xsens MTi-680G: Gazebo -> ROS 2)
 - ros_topic_name: "/imu/data"
   gz_topic_name: "/imu/data"
   ros_type_name: "sensor_msgs/msg/Imu"
   gz_type_name: "gz.msgs.IMU"
   direction: GZ_TO_ROS
 
-# 4. GPS NAVSAT (Gazebo -> ROS 2)
-- ros_topic_name: "/fix"
-  gz_topic_name: "/fix"
+# 4. GPS / GNSS NAVSAT (Xsens MTi-680G RTK GNSS: Gazebo -> ROS 2)
+- ros_topic_name: "/gnss"
+  gz_topic_name: "/gnss"
   ros_type_name: "sensor_msgs/msg/NavSatFix"
   gz_type_name: "gz.msgs.NavSat"
   direction: GZ_TO_ROS

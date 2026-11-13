@@ -16,7 +16,6 @@
   <exec_depend>ros_gz_interfaces</exec_depend>
 
   <!-- Robot and message dependencies -->
-  <exec_depend>hugr_description</exec_depend>
   <exec_depend>robot_state_publisher</exec_depend>
   <exec_depend>geometry_msgs</exec_depend>
   <exec_depend>sensor_msgs</exec_depend>
