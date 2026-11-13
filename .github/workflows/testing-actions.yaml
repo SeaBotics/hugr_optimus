@@ -1,0 +1,23 @@
+name: SeaBotics Testing Suite Action
+run-name: ${{ github.actor }} is testing code for compliance
+on:
+  push:
+    branches:
+      - main
+      - master
+  pull_request:
+    branches:
+      - main
+      - master
+jobs:
+  test_suite:
+    runs-on: ubuntu-24.04
+    container: 
+      image: rostooling/setup-ros-docker:ubuntu-noble-latest
+    steps:
+      - name: Build and Test ROS 2 Workspace
+        uses: ros-tooling/action-ros-ci@v0.4
+        with:
+          target-ros2-distro: jazzy
+
+
