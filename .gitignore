@@ -45,55 +45,12 @@ ehthumbs.db
 **/log/
 **/build/
 
+# Python cache
+**/__pycache__/
+*.pyc
+
+# Large raw CAD exports not used in runtime
+**/frame_full.stl
+
 # VS Code settings
 /.vscode/
-
-# ==========================================
-# ROS 2 Specific Folders
-# ==========================================
-# These are generated when you run 'colcon build'
-build/
-install/
-log/
-
-# COLCON_IGNORE tells colcon not to build anything in these folders
-# (Only uncomment if you manually place a COLCON_IGNORE file)
-# COLCON_IGNORE
-
-# ==========================================
-# Build Artifacts and C++ Stuff
-# ==========================================
-*.o
-*.so
-*.a
-*.la
-*.lo
-*.dylib
-CMakeFiles/
-CMakeCache.txt
-CMakeLists.txt.user*
-compile_commands.json
-
-# ==========================================
-# Python Specific Files
-# ==========================================
-__pycache__/
-*.pyc
-*.pyo
-*.pyd
-.pytest_cache/
-*.egg-info/
-.venv/
-env/
-
-# ==========================================
-# IDEs and Text Editors
-# ==========================================
-.vscode/
-.idea/
-.project
-.cproject
-*.swp
-*~
-.DS_Store
-

@@ -1,0 +1,75 @@
+/**:
+  ros__parameters:
+    sim:
+      rate_hz: 50.0            # Simulation step frequency (Hz)
+      fixed_frame: "odom"      # Odometry fixed frame
+      base_frame: "base_footprint" # Base frame attached to vessel
+
+    # Vessel Physical Properties (based on Thor Fossen Otter USV & SeaBotics ASV)
+    vessel:
+      mass: 28.0               # Mass m in kg
+      length: 1.50             # Total length in meters
+      beam: 0.85               # Beam (width) in meters
+      iz: 5.2                  # Moment of inertia Iz in kg*m^2
+      xg: 0.0                  # Center of gravity X offset from origin (m)
+      yg: 0.0                  # Center of gravity Y offset from origin (m)
+
+    # Hydrodynamic Added Mass Coefficients (Fossen notation)
+    added_mass:
+      X_u_dot: -3.5            # Added mass in surge (kg)
+      Y_v_dot: -18.0           # Added mass in sway (kg)
+      N_r_dot: -4.5            # Added inertia in yaw (kg*m^2)
+
+    # Hydrodynamic Damping Coefficients (Linear and Quadratic Drag)
+    damping:
+      # Linear Damping
+      X_u: -14.0               # Surge linear damping (N*s/m)
+      Y_v: -35.0               # Sway linear damping (N*s/m)
+      N_r: -15.0               # Yaw linear damping (N*m*s/rad)
+      # Quadratic Damping (Drag proportional to v^2)
+      X_uu: -20.0              # Surge quadratic drag (N*s^2/m^2)
+      Y_vv: -65.0              # Sway quadratic drag (N*s^2/m^2)
+      N_rr: -25.0              # Yaw quadratic drag (N*m*s^2/rad^2)
+
+    # Propulsion & Thruster Dynamics (4-Thruster Square/Cross Configuration)
+    thrusters:
+      arm_y: 0.1518            # Half-distance between port and starboard thrusters (m) [from CAD: Y = +/-0.1518m]
+      arm_x_bow: 0.2884        # Longitudinal distance from CG to bow transverse thruster (m) [from CAD: X = +0.2884m]
+      arm_x_stern: 0.4066      # Longitudinal distance from CG to stern transverse thruster (m) [from CAD: X = -0.4066m]
+      arm_x_main: 0.2323       # Longitudinal position of port/starboard main thrusters (m) [from CAD: X = -0.2323m]
+      max_thrust_per_motor: 60.0 # Maximum thrust per propeller (N)
+      time_constant: 0.12      # Motor dynamic lag time constant (seconds)
+
+    # Environmental Disturbances & Ocean Wave Dynamics (Thor Fossen & Gerstner Wave Model)
+    environment:
+      # Ocean Surface Current
+      ocean_current_speed: 0.20     # Ocean current speed V_c (m/s)
+      ocean_current_angle_deg: 45.0 # Direction towards which current flows (deg in ENU)
+      enable_current: false
+
+      # Ocean Waves & Swell (Sea State Beaufort 1-3)
+      waves:
+        enable_waves: true
+        significant_height: 0.12    # Hs in meters (0.12m = realistic coastal chop, 0.25m = moderate sea)
+        wave_length: 3.2            # Wavelength in meters (typical 2.5m - 5.0m in coastal fjords)
+        wave_direction_deg: 40.0    # Propagation direction of wave crests (degrees ENU)
+        wave_drift_coeff: 0.20      # 2nd-order mean wave drift force factor
+
+      # Marine Wind (Aerodynamic Drag on Cabins & Mast)
+      wind:
+        enable_wind: false
+        wind_speed: 3.5             # Wind speed in m/s (~7 knots gentle breeze)
+        wind_direction_deg: 90.0    # Direction wind blows towards (degrees ENU)
+
+      # Maritime Competition Buoy Field (Auto-published for perception & guidance testing)
+      competition:
+        publish_buoys: true
+        publish_rate_hz: 5.0        # Rate for buoy detection updates (Hz)
+        max_detection_range: 20.0   # Max visual range of OAK-D camera (m)
+        camera_fov_deg: 72.0        # OAK-D Pro horizontal field of view (deg)
+
+    # GNSS / GPS Datum (Reference Origin in Grimstad / Norway)
+    gnss:
+      origin_latitude: 58.334000
+      origin_longitude: 8.578000
+      origin_altitude: 0.0

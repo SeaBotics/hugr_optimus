@@ -1,0 +1,5 @@
+<launch>
+    <node pkg="thrust_allocation" exec="thrust_allocation_node">
+        <param from="$(find-pkg-share thrust_allocation)/config/thruster_params.yaml"/>
+    </node>
+</launch>

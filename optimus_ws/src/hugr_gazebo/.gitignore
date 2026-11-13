@@ -1,0 +1,19 @@
+# Build & Install artifacts
+build/
+install/
+log/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+
+# Editor & OS temporary files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db

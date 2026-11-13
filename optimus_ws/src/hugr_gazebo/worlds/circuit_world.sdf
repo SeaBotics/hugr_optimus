@@ -1,0 +1,288 @@
+<?xml version="1.0" ?>
+<sdf version="1.9">
+  <world name="circuit_world">
+    <!-- ============================================================== -->
+    <!-- WORLD SIMULATION PLUGINS                                       -->
+    <!-- ============================================================== -->
+    <physics name="1ms" type="ignored">
+      <max_step_size>0.002</max_step_size>
+      <real_time_factor>1.0</real_time_factor>
+    </physics>
+
+    <!-- Core physics and rendering systems -->
+    <plugin name="gz::sim::systems::Physics" filename="gz-sim-physics-system"/>
+    <plugin name="gz::sim::systems::UserCommands" filename="gz-sim-user-commands-system"/>
+    <plugin name="gz::sim::systems::SceneBroadcaster" filename="gz-sim-scene-broadcaster-system"/>
+    <!-- Enables Camera, Depth, IMU and GPS sensors on the boat -->
+    <plugin name="gz::sim::systems::Sensors" filename="gz-sim-sensors-system">
+      <render_engine>ogre2</render_engine>
+    </plugin>
+
+    <!-- ARCHIMEDES BUOYANCY SYSTEM (WATERLINE AT Z = 0) -->
+    <plugin
+      filename="gz-sim-buoyancy-system"
+      name="gz::sim::systems::Buoyancy">
+      <graded_buoyancy>
+        <default_density>1000</default_density>
+        <density_change>
+          <above_depth>0</above_depth>
+          <density>1.2</density>
+        </density_change>
+      </graded_buoyancy>
+      <enable>hugr_optimus::base_link</enable>
+    </plugin>
+
+    <!-- ============================================================== -->
+    <!-- SUN, SKY AND ATMOSPHERE LIGHTING                               -->
+    <!-- ============================================================== -->
+    <light type="directional" name="sun">
+      <cast_shadows>true</cast_shadows>
+      <pose>0 0 50 0 0.6 0.8</pose>
+      <diffuse>0.9 0.9 0.9 1</diffuse>
+      <specular>0.4 0.4 0.4 1</specular>
+      <direction>-0.5 0.2 -1.0</direction>
+    </light>
+
+    <!-- ============================================================== -->
+    <!-- OCEAN WATER PLANE                                              -->
+    <!-- ============================================================== -->
+    <model name="ocean_plane">
+      <static>true</static>
+      <link name="ocean_link">
+        <visual name="ocean_surface">
+          <pose>20 0 0 0 0 0</pose>
+          <geometry>
+            <plane>
+              <normal>0 0 1</normal>
+              <size>200 200</size>
+            </plane>
+          </geometry>
+          <material>
+            <ambient>0.02 0.15 0.35 0.85</ambient>
+            <diffuse>0.05 0.30 0.60 0.85</diffuse>
+            <specular>0.8 0.8 0.9 0.9</specular>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- ============================================================== -->
+    <!-- GATE 1: ENTRY GATE (X=7.0, Y=0.0)                              -->
+    <!-- ============================================================== -->
+    <!-- Gate 1 - Red Buoy at (X=7.0, Y=2.2) -->
+    <model name="gate1_red_buoy">
+      <static>true</static>
+      <pose>7.0 2.2 0.4 0 0 0</pose>
+      <link name="buoy_link">
+        <collision name="col">
+          <geometry><cylinder><radius>0.25</radius><length>0.8</length></cylinder></geometry>
+        </collision>
+        <visual name="vis">
+          <geometry><cylinder><radius>0.25</radius><length>0.8</length></cylinder></geometry>
+          <material>
+            <ambient>1.0 0.05 0.05 1</ambient>
+            <diffuse>0.95 0.05 0.05 1</diffuse>
+            <emissive>0.3 0.0 0.0 1</emissive>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- Gate 1 - Green Buoy at (X=7.0, Y=-2.2) -->
+    <model name="gate1_green_buoy">
+      <static>true</static>
+      <pose>7.0 -2.2 0.4 0 0 0</pose>
+      <link name="buoy_link">
+        <collision name="col">
+          <geometry><cylinder><radius>0.25</radius><length>0.8</length></cylinder></geometry>
+        </collision>
+        <visual name="vis">
+          <geometry><cylinder><radius>0.25</radius><length>0.8</length></cylinder></geometry>
+          <material>
+            <ambient>0.05 1.0 0.15 1</ambient>
+            <diffuse>0.05 0.95 0.15 1</diffuse>
+            <emissive>0.0 0.3 0.05 1</emissive>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- ============================================================== -->
+    <!-- GATE 2: PORT SLALOM GATE (X=15.0, Y=3.2)                        -->
+    <!-- ============================================================== -->
+    <!-- Gate 2 - Red Buoy at (X=15.0, Y=5.0) -->
+    <model name="gate2_red_buoy">
+      <static>true</static>
+      <pose>15.0 5.0 0.4 0 0 0</pose>
+      <link name="buoy_link">
+        <collision name="col">
+          <geometry><cylinder><radius>0.25</radius><length>0.8</length></cylinder></geometry>
+        </collision>
+        <visual name="vis">
+          <geometry><cylinder><radius>0.25</radius><length>0.8</length></cylinder></geometry>
+          <material>
+            <ambient>1.0 0.05 0.05 1</ambient>
+            <diffuse>0.95 0.05 0.05 1</diffuse>
+            <emissive>0.3 0.0 0.0 1</emissive>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- Gate 2 - Green Buoy at (X=15.0, Y=1.4) -->
+    <model name="gate2_green_buoy">
+      <static>true</static>
+      <pose>15.0 1.4 0.4 0 0 0</pose>
+      <link name="buoy_link">
+        <collision name="col">
+          <geometry><cylinder><radius>0.25</radius><length>0.8</length></cylinder></geometry>
+        </collision>
+        <visual name="vis">
+          <geometry><cylinder><radius>0.25</radius><length>0.8</length></cylinder></geometry>
+          <material>
+            <ambient>0.05 1.0 0.15 1</ambient>
+            <diffuse>0.05 0.95 0.15 1</diffuse>
+            <emissive>0.0 0.3 0.05 1</emissive>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- ============================================================== -->
+    <!-- MID-COURSE HAZARD OBSTACLE BUOY (HIGH-VIS BRIGHT ORANGE)       -->
+    <!-- ============================================================== -->
+    <!-- Obstacle Buoy at (X=20.0, Y=1.2) with vivid safety orange      -->
+    <model name="hazard_obstacle_buoy">
+      <static>true</static>
+      <pose>20.0 1.2 0.45 0 0 0</pose>
+      <link name="buoy_link">
+        <collision name="col">
+          <geometry><cylinder><radius>0.35</radius><length>0.9</length></cylinder></geometry>
+        </collision>
+        <visual name="vis">
+          <geometry><cylinder><radius>0.35</radius><length>0.9</length></cylinder></geometry>
+          <material>
+            <ambient>1.0 0.50 0.0 1</ambient>
+            <diffuse>1.0 0.55 0.0 1</diffuse>
+            <specular>0.8 0.4 0.0 1</specular>
+            <emissive>0.5 0.22 0.0 1</emissive>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- ============================================================== -->
+    <!-- GATE 3: STARBOARD CHICANE GATE (X=25.0, Y=-1.35)                -->
+    <!-- ============================================================== -->
+    <!-- Gate 3 - Red Buoy at (X=25.0, Y=0.5) -->
+    <model name="gate3_red_buoy">
+      <static>true</static>
+      <pose>25.0 0.5 0.4 0 0 0</pose>
+      <link name="buoy_link">
+        <collision name="col">
+          <geometry><cylinder><radius>0.25</radius><length>0.8</length></cylinder></geometry>
+        </collision>
+        <visual name="vis">
+          <geometry><cylinder><radius>0.25</radius><length>0.8</length></cylinder></geometry>
+          <material>
+            <ambient>1.0 0.05 0.05 1</ambient>
+            <diffuse>0.95 0.05 0.05 1</diffuse>
+            <emissive>0.3 0.0 0.0 1</emissive>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- Gate 3 - Green Buoy at (X=25.0, Y=-3.2) -->
+    <model name="gate3_green_buoy">
+      <static>true</static>
+      <pose>25.0 -3.2 0.4 0 0 0</pose>
+      <link name="buoy_link">
+        <collision name="col">
+          <geometry><cylinder><radius>0.25</radius><length>0.8</length></cylinder></geometry>
+        </collision>
+        <visual name="vis">
+          <geometry><cylinder><radius>0.25</radius><length>0.8</length></cylinder></geometry>
+          <material>
+            <ambient>0.05 1.0 0.15 1</ambient>
+            <diffuse>0.05 0.95 0.15 1</diffuse>
+            <emissive>0.0 0.3 0.05 1</emissive>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- ============================================================== -->
+    <!-- GATE 4: APPROACH GATE (X=33.0, Y=0.5)                          -->
+    <!-- ============================================================== -->
+    <!-- Gate 4 - Red Buoy at (X=33.0, Y=2.5) -->
+    <model name="gate4_red_buoy">
+      <static>true</static>
+      <pose>33.0 2.5 0.4 0 0 0</pose>
+      <link name="buoy_link">
+        <collision name="col">
+          <geometry><cylinder><radius>0.25</radius><length>0.8</length></cylinder></geometry>
+        </collision>
+        <visual name="vis">
+          <geometry><cylinder><radius>0.25</radius><length>0.8</length></cylinder></geometry>
+          <material>
+            <ambient>1.0 0.05 0.05 1</ambient>
+            <diffuse>0.95 0.05 0.05 1</diffuse>
+            <emissive>0.3 0.0 0.0 1</emissive>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- Gate 4 - Green Buoy at (X=33.0, Y=-1.5) -->
+    <model name="gate4_green_buoy">
+      <static>true</static>
+      <pose>33.0 -1.5 0.4 0 0 0</pose>
+      <link name="buoy_link">
+        <collision name="col">
+          <geometry><cylinder><radius>0.25</radius><length>0.8</length></cylinder></geometry>
+        </collision>
+        <visual name="vis">
+          <geometry><cylinder><radius>0.25</radius><length>0.8</length></cylinder></geometry>
+          <material>
+            <ambient>0.05 1.0 0.15 1</ambient>
+            <diffuse>0.05 0.95 0.15 1</diffuse>
+            <emissive>0.0 0.3 0.05 1</emissive>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- ============================================================== -->
+    <!-- TURNAROUND PIVOT BUOY: YELLOW PILLAR (360-DEGREE ORBIT)        -->
+    <!-- ============================================================== -->
+    <!-- Yellow Buoy at (X=42.0, Y=0.5) -->
+    <model name="pivot_yellow_buoy">
+      <static>true</static>
+      <pose>42.0 0.5 0.6 0 0 0</pose>
+      <link name="buoy_link">
+        <collision name="col">
+          <geometry><cylinder><radius>0.35</radius><length>1.2</length></cylinder></geometry>
+        </collision>
+        <visual name="vis">
+          <geometry><cylinder><radius>0.35</radius><length>1.2</length></cylinder></geometry>
+          <material>
+            <ambient>1.0 1.0 0.0 1</ambient>
+            <diffuse>1.0 0.95 0.0 1</diffuse>
+            <emissive>0.35 0.35 0.0 1</emissive>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- ============================================================== -->
+    <!-- SPAWN HUGR OPTIMUS VESSEL AT ORIGIN                            -->
+    <!-- ============================================================== -->
+    <include>
+      <uri>model://hugr_optimus</uri>
+      <name>hugr_optimus</name>
+      <pose>0 0 0.25 0 0 0</pose>
+    </include>
+
+  </world>
+</sdf>

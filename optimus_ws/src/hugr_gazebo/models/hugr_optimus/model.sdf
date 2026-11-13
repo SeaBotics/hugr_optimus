@@ -1,0 +1,399 @@
+<?xml version="1.0" ?>
+<sdf version="1.9">
+  <model name="hugr_optimus">
+    <static>false</static>
+
+    <!-- ============================================================== -->
+    <!-- MAIN CATAMARAN VESSEL BODY                                     -->
+    <!-- ============================================================== -->
+    <link name="base_link">
+      <!-- 1. INERTIAL: Center of Gravity located low between the pontoons -->
+      <!-- Guarantees positive metacentric height (GM > 0): Self-righting boat -->
+      <inertial>
+        <pose>-0.04 0.0 -0.3 0 0 0</pose>
+        <mass>35.0</mass>
+        <inertia>
+          <ixx>2.5</ixx>
+          <ixy>0.0</ixy>
+          <ixz>0.0</ixz>
+          <iyy>4.8</iyy>
+          <iyz>0.0</iyz>
+          <izz>5.5</izz>
+        </inertia>
+      </inertial>
+
+      <!-- ============================================================ -->
+      <!-- 2. VISUAL GEOMETRY: AUTHENTIC 3D CAD MESH (OnShape Assembly) -->
+      <!-- Matches exact physical CAD frame from hugr_description       -->
+      <!-- ============================================================ -->
+      <visual name="vessel_cad_frame">
+        <pose>0 0 0 0 0 -1.5708</pose>
+        <geometry>
+          <mesh>
+            <uri>model://hugr_optimus/meshes/frame.stl</uri>
+            <scale>1.0 1.0 1.0</scale>
+          </mesh>
+        </geometry>
+        <material>
+          <ambient>0.92 0.40 0.06 1.0</ambient>
+          <diffuse>0.96 0.45 0.08 1.0</diffuse>
+          <specular>0.6 0.6 0.6 1.0</specular>
+        </material>
+      </visual>
+
+      <!-- Front Luxonis OAK-D Sensor Housing on Mast -->
+      <visual name="camera_housing_visual">
+        <pose>0.4076 0.0 0.18 0 0.08 0</pose>
+        <geometry>
+          <box><size>0.04 0.12 0.03</size></box>
+        </geometry>
+        <material>
+          <ambient>0.1 0.1 0.12 1.0</ambient>
+          <diffuse>0.15 0.15 0.18 1.0</diffuse>
+        </material>
+      </visual>
+
+      <!-- ============================================================ -->
+      <!-- 3. COLLISION GEOMETRY: FAITHFUL CAD DECOMPOSITION             -->
+      <!-- Accurately follows the real 3D hull, crossbars and enclosure -->
+      <!-- ============================================================ -->
+
+      <!-- Port Pontoon Main Body (Babor: Y = +0.222 m, Z = -0.249 m) -->
+      <collision name="port_pontoon_collision">
+        <pose>-0.10 0.222 -0.249 0 0 0</pose>
+        <geometry>
+          <box><size>0.50 0.24 0.24</size></box>
+        </geometry>
+      </collision>
+
+      <!-- Port Bow Tapered Wedge  -->
+      <collision name="port_bow_collision">
+        <pose>0.19 0.222 -0.240 0 0.20 0</pose>
+        <geometry>
+          <box><size>0.14 0.22 0.22</size></box>
+        </geometry>
+      </collision>
+
+      <!-- Starboard Pontoon Main Body (Estribor: Y = -0.222 m, Z = -0.249 m) -->
+      <collision name="starboard_pontoon_collision">
+        <pose>-0.10 -0.222 -0.249 0 0 0</pose>
+        <geometry>
+          <box><size>0.50 0.24 0.24</size></box>
+        </geometry>
+      </collision>
+
+      <!-- Starboard Bow Tapered Wedge  -->
+      <collision name="starboard_bow_collision">
+        <pose>0.19 -0.222 -0.240 0 0.20 0</pose>
+        <geometry>
+          <box><size>0.14 0.22 0.22</size></box>
+        </geometry>
+      </collision>
+
+      <!-- Front Crossbar / Beam  -->
+      <collision name="front_crossbeam_collision">
+        <pose>0.12 0.0 -0.12 0 0 0</pose>
+        <geometry>
+          <box><size>0.08 0.44 0.06</size></box>
+        </geometry>
+      </collision>
+
+      <!-- Rear Crossbar / Beam  -->
+      <collision name="rear_crossbeam_collision">
+        <pose>-0.32 0.0 -0.12 0 0 0</pose>
+        <geometry>
+          <box><size>0.08 0.44 0.06</size></box>
+        </geometry>
+      </collision>
+
+      <!-- Central Electronics Enclosure  -->
+      <collision name="electronics_box_collision">
+        <pose>-0.10 0.0 -0.06 0 0 0</pose>
+        <geometry>
+          <box><size>0.30 0.28 0.12</size></box>
+        </geometry>
+      </collision>
+
+      <!-- Bow Center Sonar / Sensor Structure  -->
+      <collision name="bow_center_collision">
+        <pose>0.34 0.0 -0.24 0 0 0</pose>
+        <geometry>
+          <box><size>0.28 0.14 0.18</size></box>
+        </geometry>
+      </collision>
+
+      <!-- Stern Center Thruster Bracket  -->
+      <collision name="stern_center_collision">
+        <pose>-0.41 0.0 -0.28 0 0 0</pose>
+        <geometry>
+          <box><size>0.14 0.16 0.16</size></box>
+        </geometry>
+      </collision>
+
+      <!-- ============================================================ -->
+      <!-- 4. SENSOR SUITE                                              -->
+      <!-- ============================================================ -->
+      <!-- Front RGB Camera (Luxonis OAK-D position) -->
+      <sensor name="front_camera" type="camera">
+        <pose>0.4076 0.0 0.18 0 0.08 0</pose>
+        <always_on>1</always_on>
+        <update_rate>20</update_rate>
+        <visualize>true</visualize>
+        <topic>/oak/rgb/image_raw</topic>
+        <camera>
+          <camera_info_topic>/oak/rgb/camera_info</camera_info_topic>
+          <horizontal_fov>1.39626</horizontal_fov>
+          <image>
+            <width>1280</width>
+            <height>720</height>
+            <format>R8G8B8</format>
+          </image>
+          <clip>
+            <near>0.1</near>
+            <far>100.0</far>
+          </clip>
+        </camera>
+      </sensor>
+
+      <!-- Front Stereo Depth Camera (Luxonis OAK-D Depth) -->
+      <sensor name="front_depth_camera" type="depth_camera">
+        <pose>0.4076 0.0 0.18 0 0.08 0</pose>
+        <always_on>1</always_on>
+        <update_rate>15</update_rate>
+        <visualize>false</visualize>
+        <topic>/oak/stereo/image_raw</topic>
+        <camera>
+          <camera_info_topic>/oak/stereo/camera_info</camera_info_topic>
+          <horizontal_fov>1.39626</horizontal_fov>
+          <image>
+            <width>1280</width>
+            <height>720</height>
+            <format>R_FLOAT32</format>
+          </image>
+          <clip>
+            <near>0.2</near>
+            <far>50.0</far>
+          </clip>
+        </camera>
+      </sensor>
+
+      <!-- IMU Sensor (Xsens MTi on vessel center) -->
+      <sensor name="imu_sensor" type="imu">
+        <pose>0.0 0.0 -0.0184 0 0 0</pose>
+        <always_on>1</always_on>
+        <update_rate>100</update_rate>
+        <topic>/imu/data</topic>
+      </sensor>
+
+      <!-- GPS / NavSat Sensor (Xsens MTi-680G RTK GNSS) -->
+      <sensor name="navsat_sensor" type="navsat">
+        <pose>0.0 0.0 0.15 0 0 0</pose>
+        <always_on>1</always_on>
+        <update_rate>10</update_rate>
+        <topic>/gnss</topic>
+      </sensor>
+    </link>
+
+    <!-- ============================================================== -->
+    <!-- 4-THRUSTER PROPULSION CONFIGURATION (BlueRobotics T200 CAD)     -->
+    <!-- Coordinates extracted directly from OnShape CAD STEP assembly   -->
+    <!-- ============================================================== -->
+
+    <!-- MOTOR 1: Port Main Longitudinal Thruster (T_200_202, +Y Side) -->
+    <link name="m1_link">
+      <pose>-0.2323 0.1518 -0.3379 0 0 0</pose>
+      <inertial>
+        <mass>0.1</mass>
+        <inertia><ixx>0.0001</ixx><iyy>0.0001</iyy><izz>0.0001</izz></inertia>
+      </inertial>
+      <visual name="m1_nozzle">
+        <pose>0 0 0 0 1.5708 0</pose>
+        <geometry><cylinder><radius>0.048</radius><length>0.10</length></cylinder></geometry>
+        <material><ambient>0.05 0.2 0.7 1</ambient><diffuse>0.1 0.3 0.85 1</diffuse></material>
+      </visual>
+      <visual name="m1_propeller">
+        <pose>-0.05 0 0 0 1.5708 0</pose>
+        <geometry><sphere><radius>0.02</radius></sphere></geometry>
+        <material><ambient>0.85 0.7 0.2 1</ambient><diffuse>0.9 0.8 0.25 1</diffuse></material>
+      </visual>
+    </link>
+    <joint name="m1_joint" type="revolute">
+      <parent>base_link</parent>
+      <child>m1_link</child>
+      <axis>
+        <xyz>1 0 0</xyz>
+        <limit>
+          <lower>-1e16</lower>
+          <upper>1e16</upper>
+        </limit>
+      </axis>
+    </joint>
+
+    <!-- MOTOR 2: Starboard Main Longitudinal Thruster (T_200, -Y Side) -->
+    <link name="m2_link">
+      <pose>-0.2323 -0.1518 -0.3379 0 0 0</pose>
+      <inertial>
+        <mass>0.1</mass>
+        <inertia><ixx>0.0001</ixx><iyy>0.0001</iyy><izz>0.0001</izz></inertia>
+      </inertial>
+      <visual name="m2_nozzle">
+        <pose>0 0 0 0 1.5708 0</pose>
+        <geometry><cylinder><radius>0.048</radius><length>0.10</length></cylinder></geometry>
+        <material><ambient>0.05 0.2 0.7 1</ambient><diffuse>0.1 0.3 0.85 1</diffuse></material>
+      </visual>
+      <visual name="m2_propeller">
+        <pose>-0.05 0 0 0 1.5708 0</pose>
+        <geometry><sphere><radius>0.02</radius></sphere></geometry>
+        <material><ambient>0.85 0.7 0.2 1</ambient><diffuse>0.9 0.8 0.25 1</diffuse></material>
+      </visual>
+    </link>
+    <joint name="m2_joint" type="revolute">
+      <parent>base_link</parent>
+      <child>m2_link</child>
+      <axis>
+        <xyz>1 0 0</xyz>
+        <limit>
+          <lower>-1e16</lower>
+          <upper>1e16</upper>
+        </limit>
+      </axis>
+    </joint>
+
+    <!-- MOTOR 3: Bow Transverse Tunnel Thruster (T_200_203, Front Center) -->
+    <link name="m3_link">
+      <pose>0.2884 0.0 -0.2969 0 0 0</pose>
+      <inertial>
+        <mass>0.1</mass>
+        <inertia><ixx>0.0001</ixx><iyy>0.0001</iyy><izz>0.0001</izz></inertia>
+      </inertial>
+      <visual name="m3_duct">
+        <pose>0 0 0 1.5708 0 0</pose>
+        <geometry><cylinder><radius>0.048</radius><length>0.10</length></cylinder></geometry>
+        <material><ambient>0.05 0.2 0.7 1</ambient><diffuse>0.1 0.3 0.85 1</diffuse></material>
+      </visual>
+      <visual name="m3_propeller">
+        <geometry><sphere><radius>0.022</radius></sphere></geometry>
+        <material><ambient>0.85 0.7 0.2 1</ambient><diffuse>0.9 0.8 0.25 1</diffuse></material>
+      </visual>
+    </link>
+    <joint name="m3_joint" type="revolute">
+      <parent>base_link</parent>
+      <child>m3_link</child>
+      <axis>
+        <xyz>0 1 0</xyz>
+        <limit>
+          <lower>-1e16</lower>
+          <upper>1e16</upper>
+        </limit>
+      </axis>
+    </joint>
+
+    <!-- MOTOR 4: Stern Transverse Tunnel Thruster (T_201, Rear Center) -->
+    <link name="m4_link">
+      <pose>-0.4066 0.0 -0.2969 0 0 0</pose>
+      <inertial>
+        <mass>0.1</mass>
+        <inertia><ixx>0.0001</ixx><iyy>0.0001</iyy><izz>0.0001</izz></inertia>
+      </inertial>
+      <visual name="m4_duct">
+        <pose>0 0 0 1.5708 0 0</pose>
+        <geometry><cylinder><radius>0.048</radius><length>0.10</length></cylinder></geometry>
+        <material><ambient>0.05 0.2 0.7 1</ambient><diffuse>0.1 0.3 0.85 1</diffuse></material>
+      </visual>
+      <visual name="m4_propeller">
+        <geometry><sphere><radius>0.022</radius></sphere></geometry>
+        <material><ambient>0.85 0.7 0.2 1</ambient><diffuse>0.9 0.8 0.25 1</diffuse></material>
+      </visual>
+    </link>
+    <joint name="m4_joint" type="revolute">
+      <parent>base_link</parent>
+      <child>m4_link</child>
+      <axis>
+        <xyz>0 1 0</xyz>
+        <limit>
+          <lower>-1e16</lower>
+          <upper>1e16</upper>
+        </limit>
+      </axis>
+    </joint>
+
+    <!-- ============================================================== -->
+    <!-- 6-DOF FOSSEN HYDRODYNAMIC DAMPING                              -->
+    <!-- Strictly energy-dissipating for unconditional numerical stability -->
+    <!-- ============================================================== -->
+    <plugin name="gz::sim::systems::Hydrodynamics" filename="gz-sim-hydrodynamics-system">
+      <link_name>base_link</link_name>
+      <!-- Linear Damping (Absorbs heave oscillations and roll wobble) -->
+      <xU>-15.0</xU>
+      <yV>-35.0</yV>
+      <zW>-80.0</zW>
+      <kP>-25.0</kP>
+      <mQ>-35.0</mQ>
+      <nR>-15.0</nR>
+
+      <!-- Quadratic Drag (Limits top speed smoothly) -->
+      <xUabsU>-20.0</xUabsU>
+      <yVabsV>-50.0</yVabsV>
+      <zWabsW>-80.0</zWabsW>
+      <kPabsP>-20.0</kPabsP>
+      <mQabsQ>-30.0</mQabsQ>
+      <nRabsR>-18.0</nRabsR>
+    </plugin>
+
+    <!-- ============================================================== -->
+    <!-- 4 THRUSTER FORCE PLUGINS                                       -->
+    <!-- ============================================================== -->
+    <plugin name="gz::sim::systems::Thruster" filename="gz-sim-thruster-system">
+      <joint_name>m1_joint</joint_name>
+      <namespace>hugr/thrusters/m1</namespace>
+      <topic>cmd_thrust</topic>
+      <thrust_coefficient>0.02</thrust_coefficient>
+      <fluid_density>1000</fluid_density>
+      <propeller_diameter>0.1</propeller_diameter>
+      <use_angvel_cmd>false</use_angvel_cmd>
+    </plugin>
+
+    <plugin name="gz::sim::systems::Thruster" filename="gz-sim-thruster-system">
+      <joint_name>m2_joint</joint_name>
+      <namespace>hugr/thrusters/m2</namespace>
+      <topic>cmd_thrust</topic>
+      <thrust_coefficient>0.02</thrust_coefficient>
+      <fluid_density>1000</fluid_density>
+      <propeller_diameter>0.1</propeller_diameter>
+      <use_angvel_cmd>false</use_angvel_cmd>
+    </plugin>
+
+    <plugin name="gz::sim::systems::Thruster" filename="gz-sim-thruster-system">
+      <joint_name>m3_joint</joint_name>
+      <namespace>hugr/thrusters/m3</namespace>
+      <topic>cmd_thrust</topic>
+      <thrust_coefficient>0.02</thrust_coefficient>
+      <fluid_density>1000</fluid_density>
+      <propeller_diameter>0.1</propeller_diameter>
+      <use_angvel_cmd>false</use_angvel_cmd>
+    </plugin>
+
+    <plugin name="gz::sim::systems::Thruster" filename="gz-sim-thruster-system">
+      <joint_name>m4_joint</joint_name>
+      <namespace>hugr/thrusters/m4</namespace>
+      <topic>cmd_thrust</topic>
+      <thrust_coefficient>0.02</thrust_coefficient>
+      <fluid_density>1000</fluid_density>
+      <propeller_diameter>0.1</propeller_diameter>
+      <use_angvel_cmd>false</use_angvel_cmd>
+    </plugin>
+
+    <!-- ============================================================== -->
+    <!-- VESSEL ODOMETRY TELEMETRY PUBLISHER                            -->
+    <!-- Publishes 3D position, heading and velocity to Gazebo topic    -->
+    <!-- ============================================================== -->
+    <plugin filename="gz-sim-odometry-publisher-system" name="gz::sim::systems::OdometryPublisher">
+      <dimensions>3</dimensions>
+      <odom_publish_frequency>50</odom_publish_frequency>
+      <odom_topic>/model/hugr_optimus/odometry</odom_topic>
+      <odom_frame>odom</odom_frame>
+      <robot_base_frame>base_link</robot_base_frame>
+    </plugin>
+
+  </model>
+</sdf>

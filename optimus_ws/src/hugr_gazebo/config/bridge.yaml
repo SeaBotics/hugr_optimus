@@ -1,0 +1,83 @@
+# ==============================================================
+# HUGR OPTIMUS - ROS 2 <-> GAZEBO HARMONIC BRIDGE CONFIGURATION
+# Matches exact real vessel sensor topics (OAK-D, Xsens MTi-680G)
+# ==============================================================
+
+# 1. SIMULATION CLOCK (Gazebo -> ROS 2)
+- ros_topic_name: "/clock"
+  gz_topic_name: "/world/circuit_world/clock"
+  ros_type_name: "rosgraph_msgs/msg/Clock"
+  gz_type_name: "gz.msgs.Clock"
+  direction: GZ_TO_ROS
+
+# 2. FORWARD CAMERA STREAM (Luxonis OAK-D RGB & Info: Gazebo -> ROS 2)
+- ros_topic_name: "/oak/rgb/image_raw"
+  gz_topic_name: "/oak/rgb/image_raw"
+  ros_type_name: "sensor_msgs/msg/Image"
+  gz_type_name: "gz.msgs.Image"
+  direction: GZ_TO_ROS
+
+- ros_topic_name: "/oak/rgb/camera_info"
+  gz_topic_name: "/oak/rgb/camera_info"
+  ros_type_name: "sensor_msgs/msg/CameraInfo"
+  gz_type_name: "gz.msgs.CameraInfo"
+  direction: GZ_TO_ROS
+
+# 2b. FORWARD STEREO DEPTH STREAM (Luxonis OAK-D Stereo Depth & Info: Gazebo -> ROS 2)
+- ros_topic_name: "/oak/stereo/image_raw"
+  gz_topic_name: "/oak/stereo/image_raw"
+  ros_type_name: "sensor_msgs/msg/Image"
+  gz_type_name: "gz.msgs.Image"
+  direction: GZ_TO_ROS
+
+- ros_topic_name: "/oak/stereo/camera_info"
+  gz_topic_name: "/oak/stereo/camera_info"
+  ros_type_name: "sensor_msgs/msg/CameraInfo"
+  gz_type_name: "gz.msgs.CameraInfo"
+  direction: GZ_TO_ROS
+
+# 3. IMU SENSOR (Xsens MTi-680G: Gazebo -> ROS 2)
+- ros_topic_name: "/imu/data"
+  gz_topic_name: "/imu/data"
+  ros_type_name: "sensor_msgs/msg/Imu"
+  gz_type_name: "gz.msgs.IMU"
+  direction: GZ_TO_ROS
+
+# 4. GPS / GNSS NAVSAT (Xsens MTi-680G RTK GNSS: Gazebo -> ROS 2)
+- ros_topic_name: "/gnss"
+  gz_topic_name: "/gnss"
+  ros_type_name: "sensor_msgs/msg/NavSatFix"
+  gz_type_name: "gz.msgs.NavSat"
+  direction: GZ_TO_ROS
+
+# 5. INTERNAL THRUSTERS (Hidden from ros2 topic list with leading underscore)
+- ros_topic_name: "/_hugr/thrusters/m1/cmd_thrust"
+  gz_topic_name: "/hugr/thrusters/m1/cmd_thrust"
+  ros_type_name: "std_msgs/msg/Float64"
+  gz_type_name: "gz.msgs.Double"
+  direction: ROS_TO_GZ
+
+- ros_topic_name: "/_hugr/thrusters/m2/cmd_thrust"
+  gz_topic_name: "/hugr/thrusters/m2/cmd_thrust"
+  ros_type_name: "std_msgs/msg/Float64"
+  gz_type_name: "gz.msgs.Double"
+  direction: ROS_TO_GZ
+
+- ros_topic_name: "/_hugr/thrusters/m3/cmd_thrust"
+  gz_topic_name: "/hugr/thrusters/m3/cmd_thrust"
+  ros_type_name: "std_msgs/msg/Float64"
+  gz_type_name: "gz.msgs.Double"
+  direction: ROS_TO_GZ
+
+- ros_topic_name: "/_hugr/thrusters/m4/cmd_thrust"
+  gz_topic_name: "/hugr/thrusters/m4/cmd_thrust"
+  ros_type_name: "std_msgs/msg/Float64"
+  gz_type_name: "gz.msgs.Double"
+  direction: ROS_TO_GZ
+
+# 6. VESSEL ODOMETRY TELEMETRY (Gazebo -> ROS 2)
+- ros_topic_name: "/odometry"
+  gz_topic_name: "/model/hugr_optimus/odometry"
+  ros_type_name: "nav_msgs/msg/Odometry"
+  gz_type_name: "gz.msgs.Odometry"
+  direction: GZ_TO_ROS

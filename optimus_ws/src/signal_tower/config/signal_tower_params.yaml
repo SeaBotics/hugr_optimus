@@ -1,0 +1,10 @@
+signal_tower_node:
+  ros__parameters:
+    sim_mode: true
+    watchdog_timeout_sec: 0.5
+    mode_topic: "/system/mode"
+    status_topic: "/signal_tower/status"
+    led_color_topic: "/led_color"
+    gpio_pin_red: 17
+    gpio_pin_yellow: 27
+    gpio_pin_green: 22

@@ -1,134 +1,68 @@
 # hugr_optimus
 
-The official repository for the SeaBotics Hugr Optimus. This repo is the succesor to the Hugr Primus repository for legacy code.
+The official repository for the **SeaBotics Hugr Optimus**. This repo is the successor to the Hugr Primus repository for legacy code.
 
-The Hugr Optimus is a fully autonomous surface vessel, i.e. Autonomous Boat, built by students to compete in national and international competitions.
+The Hugr Optimus is a fully autonomous surface vessel (ASV) built by students at the **University of Agder** to compete in national and international competitions.
 
-We are from the University of Agder, and open for all students in Agder.
+---
 
-## Contributions
-
-In order to contribute to this repository, please read the information and guidelines below.
-
-## Overview
+## 📂 Repository Overview
 
 ```tree
 hugr_optimus
-├─ Dependencies         - External dependencies
-├─ Documentation        - Tasks, schematics, datasheets, etc..
-├─ Misc                 - Code examples: ROS2 in practice
-├─ Templates            - ROS2 templates for different frameworks 
-└─ optimus_ws/src/      - Main workspace for Hugr Optimus
+├─ Dependencies   - External dependencies
+├─ Documentations - Tasks, schematics, datasheets, etc.
+├─ Misc           - Code examples: ROS2 in practice
+├─ Templates      - ROS2 templates for different frameworks 
+└─ optimus_ws     - Main workspace for Hugr Optimus
+    ├─ scripts    - Quick-launch scripts for Linux/WSL2 and Windows
+    ├─ tools      - Teleoperation, motor dashboard, and telemetry utilities
+    └─ src
+        ├─ hugr_gazebo        - 3D Gazebo Sim (Harmonic) maritime simulation
+        ├─ hugr_sim           - 2D Fossen SITL hydrodynamic simulator + RViz2
+        ├─ hugr_description   - URDF model, coordinate frames & 3D CAD meshes
+        ├─ hugr_autonomy      - Autonomous waypoint navigation (LOS guidance)
+        ├─ thrust_allocation  - 4-thruster allocation matrix (cmd_vel -> PWMs)
+        ├─ signal_tower       - Safety signal tower indicator node
+        └─ xsens_mti_driver   - Xsens MTi IMU driver
 ```
----
-
-### Tech Stack
-
-`hugr_optimus` is a repository that is owned, maintained and managed by the SeaBotics Student Association. The project tech stack mainly revolves around a few specific frameworks and languages, but component work may require more specialized and nuanced languages. In order to get started with development a few basics must be in order:
-
-- Ubuntu 24.04 LTS
-- ROS 2 Jazzy
-- C/C++ & Python
-
-In addition to these basics you may find downloading an IDE to be preferable for development through the project Docker container, preferably Visual Studio Code (VSC) due to its Docker integration. Hardware and Software technology and interfacing overviews are located in `dokumentasjon/`. You may follow the setup steps below in order to set up your computer. 
-
-### Setup
-
-In order to run, test and modify the code we've created a docker environment which you may run whenever you are going to access the repository code on your computer.
-
-#### Step 1 - Download Docker
-
-You may download Docker natively on your computer for your specific Operating System (OS) by following the links below:
-
-- [Docker Desktop - Mac](https://docs.docker.com/desktop/setup/install/mac-install/)
-- [Docker Desktop - Windows](https://docs.docker.com/desktop/setup/install/windows-install/)
-- [Docker Desktop - Linux](https://docs.docker.com/desktop/setup/install/linux/)
-
-Want to know more about what Docker is and how it works? Check out [this link](https://docs.docker.com/get-started/docker-overview/). If you are a Windows user you will have to install WSL2 and run Ubuntu 24.04 LTS on it there. To install WSL2 follow [this link](https://learn.microsoft.com/en-us/windows/wsl/install). 
-
-#### Step 2 - Fork the repository
-
-In order to make contributions towards the main code repository you will need to fork the main repository to your local GitHub user. In this way, when you want to merge your code with the main repository you will create a Pull Request (PR), which in turn will automatically trigger a Continous Integration (CI) pipeline which runs various tests to verify your code is valid and able to be merged without causing major issues. 
-
-To perform the fork, follow the steps below:
-
---- 
-
-Start by clicking on the dropdown next to the fork button.
-![Start by clicking on the dropdown next to the fork button](Documentation/figures/fork_step1.png)
-
-Click the create new fork button to create a new fork local to your GitHub user.
-![Click the create new fork button](Documentation/figures/fork_step2.png)
-
-Click "Create fork" again to create the fork, leave every input as standard, no need to change anything.
-![Leave everything as standard and click create](Documentation/figures/fork_step3.png)
-
-Congrats! You now have a local fork of the main repository, ready to do with as you please!
-
-#### Step 3 - Clone the repository
-
-To interact with the code on your local computer you must clone your fork to your computer. Cloning is typically done in two ways, through `HTTPS` or via `SSH`.
 
 ---
 
-Click the code dropdown button.
-![Click the code dropdown button](Documentation/figures/clone_step1.png)
+## ⚡ Quickstart: Simulation & Development
 
+### 1. Requirements
+- Ubuntu 24.04 (native or WSL2)
+- ROS 2 Jazzy Jalisco
+- Gazebo Sim Harmonic (`sudo apt install -y ros-jazzy-ros-gz ros-jazzy-ros-gz-sim ros-jazzy-ros-gz-bridge`)
 
-You may copy from either HTTPS...
-![You may copy from either HTTPS](Documentation/figures/clone_step2.png)
+### 2. Build the Workspace
+From the `optimus_ws` directory:
 
-Or from SSH.
-![Or SSH](Documentation/figures/clone_step3.png)
+```bash
+cd optimus_ws
+source /opt/ros/jazzy/setup.bash
+colcon build --symlink-install
+source install/setup.bash
+```
 
-If you're going to utilize SSH, make sure to add your SSH key to your GitHub profile with read/write permissions. To get more familiar with SSH, learn how to generate a key and add it to your profile, follow [this link](https://docs.github.com/en/authentication/connecting-to-github-with-ssh).
+### 3. Launching Simulations
 
-#### Step 4 - Run the Docker Container
+- **3D Gazebo Sim (Harmonic) with water buoyancy, sensors & competition circuit:**
+  ```bash
+  ./run_gazebo.sh
+  # or directly: ros2 launch hugr_gazebo sim.launch.py
+  ```
 
-In order to develop code through the Docker Container, you will need to boot it before each coding session. Run the following code in your terminal (Git Bash, Linux Terminal etc.) in order to boot up the container. Make sure you're standing in the repository folder when your run the container!
+- **Fast 2D Fossen SITL Simulator with RViz2:**
+  ```bash
+  ./run_simulation.sh
+  # or directly: ros2 launch hugr_sim sim.launch.py
+  ```
 
-`docker build -t ros2-jazzy-dev .`
-
-Then run the next sequence of code as long as you're in the root of the repository folder:
-
-`docker run -it -d \
-  --name optimus-dev \
-  -v $(pwd)/optimus_ws/src:/home/ros/optimus_ws/src \
-  ros2-jazzy-dev bash`
-
-You might need to perform the following commands to be able to run the container:
-
-`sudo usermod -aG docker $USER && newgrp docker` 
-
-#### Step 5 - Git and Development
-
-When you're going to develop on your forked repository, it is important that you are connected to the standardized Docker container environment to avoid cross-platform contamination and avoiding problems of having some tools work but not others. 
-
-After you've booted up the container you may access it through [VSCode](https://code.visualstudio.com/download?_exp_download=fb315fc982) by adding the Docker extension to VSCode and then clicking the arrows in the bottom left:
-
-![Click the two arrown on bottom left](Documentation/figures/vs_1.png)
-
-You must then attach to the running container:
-
-![Attach to running container](Documentation/figures/vs_2.png)
-
-Choose the `/optimus_dev` container for development:
-
-![Choose correct container](Documentation/figures/vs_3.png)
-
-You will see you're in a container when the arrows in the bottom left turn blue and the explorer highlights the source directory of the container as displayed in red here:
-
-![Display of container environment](Documentation/figures/vs_4.png)
-
-When you're in the container environment you may alter code and develop code as you see fit, however to push the changes you've made unto your forked repository, you must exit the remote connection by clicking on the blue arrows in the bottom left and clicking the `close remote connection` button on the explorer:
-
-![Close remote connection](Documentation/figures/vs_5.png)
-
-When you're working with Git, make sure to sort out any git merge conflicts internally within your fork and your team. This can be done by fetching the new head of the development branch of your repository and performing a rebase before starting development and after performing development, and then comitting and pushing your code. If you have any questions regarding Git, consult one of the senior software members or you may also utilize an LLM if the conflicts are minor.  
-
-### Rules
-
-...
----
-
-> Maintained by SeaBotics Student Association
+### 4. Teleoperation & Testing
+All convenience launchers are available in `optimus_ws/scripts/`:
+- **Keyboard Teleop:** `bash scripts/run_teleop.sh`
+- **Gamepad / Joystick:** `bash scripts/run_joystick.sh` (or `scripts/run_gamepad_teleop.bat` on Windows)
+- **Motor Web Dashboard:** `bash scripts/run_motor_dashboard.sh` (open `http://localhost:8080`)
+- **Autonomous Navigation:** `bash scripts/run_autonomy.sh`
