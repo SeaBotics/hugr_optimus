@@ -1,4 +1,4 @@
-# External dependencies
+# External physical library dependencies
 
 ## Dependencies description
 
@@ -19,3 +19,5 @@ If github does not download the submodule directly, use:
 ```bash
 git submodule update --init --recursive
 ```
+
+
