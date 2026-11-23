@@ -1,0 +1,23 @@
+# Ros2Router (DDS Router over Husarnet) with a topic filter.
+# Run the same file on both foc and primus:
+#   cd ~/Code/ros2router   (or wherever this folder lives)
+#   docker compose up -d
+#
+# Peers are read from the Husarnet whitelist when the container starts.
+# If a machine (re)joins Husarnet, run `docker compose restart` on the others.
+
+services:
+  ros2router:
+    image: husarnet/ros2router:1.4.0
+    container_name: ros2router
+    restart: unless-stopped
+    network_mode: host
+    ipc: host
+    volumes:
+      - ./filter.yaml:/filter.yaml:ro
+    environment:
+      - USE_HUSARNET=TRUE
+      - ROS_DOMAIN_ID=0
+      # Matches ROS_LOCALHOST_ONLY=1 on the hosts: the router talks to the
+      # local ROS nodes over loopback only.
+      - ROS_LOCALHOST_ONLY=1
