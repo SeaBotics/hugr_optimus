@@ -1,13 +1,23 @@
-# Start script for Primus / Optimus, runs every node in ws/src upon start
+#!/bin/bash
 
 # Source packages
 cd optimus_ws
-colcon build
+colcon build --symlink-install
 source install/setup.bash
 
-# Launch all camera nodes in background (&) discard stdout > /dev/null 2>&1
-ros2 launch depthai_ros_driver_v3 driver.launch.py params_file:=camera.yaml > /dev/null 2>&1 & 
-ros2 run neuralnetwork yolo_detector > /dev/null 2>&1 &
-ros2 run neuralnetwork overlay_creator > /dev/null 2>&1 &
-ros2 launch foxglove_bridge foxglove_bridge_launch.xml > /dev/null 2>&1 &
-~                                                                             
+echo "Starting camera driver..."
+# Run the working standalone node in background with output redirected to a log file for debugging
+ros2 launch depthai_ros_driver_v3 driver.launch.py > ~/camera_driver.log 2>&1 &
+sleep 3
+
+echo "Starting neural network nodes..."
+ros2 run neuralnetwork yolo_detector > ~/yolo.log 2>&1 &
+sleep 2
+
+ros2 run neuralnetwork overlay_creator > ~/overlay.log 2>&1 &
+sleep 2
+
+echo "Starting Foxglove bridge..."
+ros2 launch foxglove_bridge foxglove_bridge_launch.xml > ~/foxglove.log 2>&1 &
+
+echo "All nodes started! Check logs in ~/*.log if anything fails."

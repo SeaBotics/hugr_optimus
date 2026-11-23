@@ -16,7 +16,7 @@ class YoloDetectorNode(Node):
         super().__init__('yolo_detector')
 
         # Automatically locate weights relative to this script's install path
-        model_path = Path(__file__).parent / "YOLO26n_buoy_detector_v2.engine"
+        model_path = Path(__file__).parent / "best.engine"
 
         if not model_path.exists():
             self.get_logger().error(f"Model file not found at: {model_path}")
