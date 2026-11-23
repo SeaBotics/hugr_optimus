@@ -36,7 +36,7 @@ for h in "$FOC" "$PRIMUS"; do
 done
 
 echo "3. Nodes on $PRIMUS"
-for p in oak_container yolo_detector overlay_creator foxglove_bridge; do
+for p in oak_container yolo_detector overlay_creator foxglove_bridge thrust_allocation; do
     check "$p running" on "$PRIMUS" "pgrep -f [${p:0:1}]${p:1}"
 done
 check "camera publishes /oak/rgb/image_raw/compressed" on "$PRIMUS" 'timeout 15 ros2 topic echo --once /oak/rgb/image_raw/compressed sensor_msgs/msg/CompressedImage --field header'
