@@ -10,6 +10,7 @@ services:
     environment:
       - USE_HUSARNET=TRUE
       - ROS_DOMAIN_ID=0
-      - ROS_LOCALHOST_ONLY=1
+      # 1 restricts the router to 127.0.0.1 and it no longer finds Jazzy nodes
+      - ROS_LOCALHOST_ONLY=0
       - EXIT_IF_HUSARNET_NOT_AVAILABLE=TRUE
       - EXIT_IF_HOST_TABLE_CHANGED=TRUE
