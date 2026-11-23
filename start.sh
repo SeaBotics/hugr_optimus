@@ -29,7 +29,7 @@ sleep 2
 
 echo "Starting Foxglove bridge..."
 # Husarnet is IPv6-only
-ros2 launch foxglove_bridge foxglove_bridge_launch.xml address:=:: > ~/foxglove.log 2>&1 &
+ros2 launch foxglove_bridge foxglove_bridge_launch.xml address:="'::'" send_buffer_limit:=100000 > ~/foxglove.log 2>&1 &
 
 echo "All nodes started. Logs in ~/*.log. Ctrl+C stops everything."
 wait
