@@ -7,7 +7,6 @@ allowlist:
   # primus -> foc
   - name: "rt/oak/rgb/detections"
   - name: "rt/oak/rgb/image_annotations"
-  - name: "rt/oak/rgb/image_raw/compressed"
   - name: "rt/tf"
   - name: "rt/tf_static"
   - name: "rt/joint_states"
