@@ -1,25 +1,17 @@
-# Topics Ros2Router is allowed to forward between foc and primus over Husarnet.
-# Everything not listed here stays local to the machine (raw camera images,
-# depth, point clouds, etc.), so the Husarnet link is not flooded.
-#
-# DDS topic names use the "rt/" prefix: ROS topic /foo  ->  "rt/foo".
-# Wildcards (*) are allowed, e.g. "rt/oak/rgb/*".
-#
-# The router re-reads this file every ~5 s, but restart the container after
-# editing to be safe:  docker compose restart
-
 allowlist:
-  # foc -> primus: Xbox controller (thrust_allocation subscribes to /joy)
+  # foc -> primus
   - name: "rt/joy"
   - name: "rt/joy/set_feedback"
   - name: "rt/cmd_vel"
 
-  # primus -> foc: vision results
+  # primus -> foc
   - name: "rt/oak/rgb/detections"
   - name: "rt/oak/rgb/image_annotations"
   - name: "rt/oak/rgb/image_raw/compressed"
-
-  # Status
+  - name: "rt/tf"
+  - name: "rt/tf_static"
+  - name: "rt/joint_states"
+  - name: "rt/robot_description"
   - name: "rt/diagnostics"
   - name: "rt/rosout"
 
