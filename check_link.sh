@@ -1,5 +1,5 @@
 #!/bin/bash
-# Run from a machine with SSH key access to foc and primus.
+# Run on foc, primus, or any machine with SSH key access to both.
 
 PRIMUS=${PRIMUS:-primus}
 FOC=${FOC:-foc}
@@ -9,7 +9,11 @@ failed=0
 
 on() {
     local host=$1; shift
-    ssh -o BatchMode=yes -o ConnectTimeout=10 "$host" "$ROS_ENV $*" </dev/null
+    if [ "${host#*@}" = "$(hostname)" ]; then
+        bash -c "$ROS_ENV $*" </dev/null
+    else
+        ssh -o BatchMode=yes -o ConnectTimeout=10 "$host" "$ROS_ENV $*" </dev/null
+    fi
 }
 
 check() {
@@ -21,6 +25,13 @@ check() {
         failed=1
     fi
 }
+
+for h in "$FOC" "$PRIMUS"; do
+    if ! on "$h" true >/dev/null 2>&1; then
+        echo "Cannot SSH to $h without a password. Set up a key: ssh-keygen -t ed25519 && ssh-copy-id $h"
+        exit 2
+    fi
+done
 
 echo "1. Husarnet"
 for h in "$FOC" "$PRIMUS"; do
