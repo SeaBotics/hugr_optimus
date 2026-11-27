@@ -24,6 +24,7 @@ setup(
         'console_scripts': [
             'yolo_detector = neuralnetwork.yolo_detector:main',
             'overlay_creator = neuralnetwork.overlay_creator:main',
+            'image_preview = neuralnetwork.image_preview:main',
         ],
     },
 )

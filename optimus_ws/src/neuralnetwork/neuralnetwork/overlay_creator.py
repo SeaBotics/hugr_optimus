@@ -25,19 +25,32 @@ class OverlayNode(Node):
             10
         )
 
+        # Same annotations scaled to the image_preview resolution
+        self.declare_parameter('preview_scale', 0.5)
+        self.preview_publisher = self.create_publisher(
+            ImageAnnotations,
+            '/oak/rgb/preview/image_annotations',
+            10
+        )
+
         self.get_logger().info("Overlay Node active. Listening on '/oak/rgb/detections'.")
 
     def detections_callback(self, msg: Detection2DArray):
+        self.publisher.publish(self.build_annotations(msg, 1.0))
+        scale = self.get_parameter('preview_scale').value
+        self.preview_publisher.publish(self.build_annotations(msg, scale))
+
+    def build_annotations(self, msg: Detection2DArray, scale: float) -> ImageAnnotations:
         annotations = ImageAnnotations()
 
         if hasattr(annotations, 'timestamp'):
             annotations.timestamp = msg.header.stamp
 
         for detection in msg.detections:
-            cx = detection.bbox.center.position.x
-            cy = detection.bbox.center.position.y
-            w = detection.bbox.size_x
-            h = detection.bbox.size_y
+            cx = detection.bbox.center.position.x * scale
+            cy = detection.bbox.center.position.y * scale
+            w = detection.bbox.size_x * scale
+            h = detection.bbox.size_y * scale
 
             # Convert center-based coordinates to 4 box corners
             x1 = cx - (w / 2.0)
@@ -92,15 +105,15 @@ class OverlayNode(Node):
                 label_text = f"{detection.results[0].hypothesis.class_id} ({score:.2f})"
 
                 text_anno = TextAnnotation()
-                text_anno.position = Point2(x=float(x1), y=float(max(0.0, y1 - 5.0)))
+                text_anno.position = Point2(x=float(x1), y=float(max(0.0, y1 - 5.0 * scale)))
                 text_anno.text = label_text
-                text_anno.font_size = 14.0
+                text_anno.font_size = 14.0 * scale
                 text_anno.text_color = Color(r=1.0, g=1.0, b=1.0, a=1.0)  # White text
                 text_anno.background_color = label_bg_color
 
                 annotations.texts.append(text_anno)
 
-        self.publisher.publish(annotations)
+        return annotations
 
 
 def main(args=None):

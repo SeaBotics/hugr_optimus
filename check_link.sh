@@ -47,11 +47,13 @@ for h in "$FOC" "$PRIMUS"; do
 done
 
 echo "3. Nodes on $PRIMUS"
-for p in oak_container yolo_detector overlay_creator foxglove_bridge thrust_allocation; do
+for p in oak_container yolo_detector overlay_creator image_preview foxglove_bridge thrust_allocation; do
     check "$p running" on "$PRIMUS" "pgrep -f [${p:0:1}]${p:1}"
 done
 check "camera publishes /oak/rgb/image_raw/compressed" on "$PRIMUS" 'timeout 15 ros2 topic echo --once /oak/rgb/image_raw/compressed sensor_msgs/msg/CompressedImage --field header'
 check "YOLO publishes /oak/rgb/detections" on "$PRIMUS" 'timeout 15 ros2 topic echo --once /oak/rgb/detections vision_msgs/msg/Detection2DArray --field header'
+check "preview publishes /oak/rgb/preview/compressed" on "$PRIMUS" 'timeout 15 ros2 topic echo --once /oak/rgb/preview/compressed sensor_msgs/msg/CompressedImage --field header'
+check "preview publishes /oak/rgb/preview/camera_info" on "$PRIMUS" 'timeout 15 ros2 topic echo --once /oak/rgb/preview/camera_info sensor_msgs/msg/CameraInfo --field width'
 
 echo "4. Foxglove"
 check "foxglove_bridge listens on IPv6 :8765" on "$PRIMUS" 'ss -ltn | grep -qE "(\*|\[::\]):8765"'

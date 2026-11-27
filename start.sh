@@ -8,7 +8,7 @@ fi
 WS="$(cd "$(dirname "$0")" && pwd)/optimus_ws"
 cd "$WS" || exit 1
 
-pkill -f "depthai_ros_driver_v3|oak_container|yolo_detector|overlay_creator|foxglove_bridge|thrust_allocation"
+pkill -f "depthai_ros_driver_v3|oak_container|yolo_detector|overlay_creator|image_preview|foxglove_bridge|thrust_allocation"
 sleep 2
 
 colcon build --symlink-install || exit 1
@@ -26,6 +26,10 @@ sleep 2
 
 ros2 run neuralnetwork overlay_creator > ~/overlay.log 2>&1 &
 sleep 2
+
+echo "Starting 320x320 preview for Foxglove..."
+ros2 run neuralnetwork image_preview > ~/preview.log 2>&1 &
+sleep 1
 
 echo "Starting thrust allocation..."
 ros2 run thrust_allocation thrust_allocation > ~/thrust.log 2>&1 &
