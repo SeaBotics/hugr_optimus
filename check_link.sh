@@ -3,7 +3,7 @@
 
 PRIMUS=${PRIMUS:-primus}
 FOC=${FOC:-foc}
-ROS_ENV='source /opt/ros/jazzy/setup.bash; source ~/Code/optimus_ws/install/setup.bash 2>/dev/null; export ROS_LOCALHOST_ONLY=1;'
+ROS_ENV='source /opt/ros/jazzy/setup.bash; source ~/Code/optimus_ws/install/setup.bash 2>/dev/null;'
 
 failed=0
 

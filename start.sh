@@ -5,6 +5,9 @@ if [[ "${BASH_SOURCE[0]}" != "$0" ]]; then
     return 1
 fi
 
+# Do not rely on ~/.bashrc (not read by tmux/ssh/systemd commands)
+source /opt/ros/jazzy/setup.bash
+
 WS="$(cd "$(dirname "$0")" && pwd)/optimus_ws"
 cd "$WS" || exit 1
 
