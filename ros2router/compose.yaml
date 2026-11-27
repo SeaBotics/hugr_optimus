@@ -1,0 +1,16 @@
+services:
+  ros2router:
+    image: husarnet/ros2router:1.4.0
+    container_name: ros2router
+    restart: unless-stopped
+    network_mode: host
+    ipc: host
+    volumes:
+      - ./filter.yaml:/filter.yaml:ro
+    environment:
+      - USE_HUSARNET=TRUE
+      - ROS_DOMAIN_ID=0
+      # 1 restricts the router to 127.0.0.1 and it no longer finds Jazzy nodes
+      - ROS_LOCALHOST_ONLY=0
+      - EXIT_IF_HUSARNET_NOT_AVAILABLE=TRUE
+      - EXIT_IF_HOST_TABLE_CHANGED=TRUE

@@ -1,0 +1,18 @@
+allowlist:
+  # foc -> primus
+  - name: "rt/joy"
+  - name: "rt/joy/set_feedback"
+  - name: "rt/cmd_vel"
+
+  # primus -> foc
+  - name: "rt/oak/rgb/detections"
+  - name: "rt/oak/rgb/image_annotations"
+  - name: "rt/tf"
+  - name: "rt/tf_static"
+  - name: "rt/joint_states"
+  - name: "rt/robot_description"
+  - name: "rt/diagnostics"
+  - name: "rt/rosout"
+
+blocklist: []
+builtin-topics: []

@@ -1,3 +1,6 @@
 [submodule "Dependencies/joystick_drivers"]
 	path = Dependencies/joystick_drivers
 	url = https://github.com/ros-drivers/joystick_drivers.git
+[submodule "Dependencies/depthai-core"]
+	path = Dependencies/depthai-core
+	url = https://github.com/luxonis/depthai-core.git
